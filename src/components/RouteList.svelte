@@ -1,5 +1,3 @@
-Can you make sure the strike through is also persistent?
-
 <script>
 	let newItem = "";
 
