@@ -24,8 +24,11 @@
     }
   }
 
-  // Save the value to local storage whenever it changes
-  $: storage.setItem('savedInput', inputValue);
+  // Update inputValue when the content of the span changes
+  function handleInput(event) {
+    inputValue = event.target.textContent;
+    storage.setItem('savedInput', inputValue);
+  }
 </script>
 
-<input class='text-white font-medium text-xl bg-transparent' type="text" bind:value={inputValue} />
+<span class='text-white font-medium text-xl bg-transparent' contenteditable="true" bind:innerHTML={inputValue} on:input={handleInput}></span>
