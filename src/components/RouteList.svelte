@@ -45,15 +45,19 @@
 
 <div class="mt-12 grid grid-cols-2 gap-y-6 gap-x-6 w-full items-center">
 	{#each todoList as item, index}
-		<div class="flex items-center justify-between border border-gray-300 rounded-md p-3">
-			<input bind:checked={item.status} type="checkbox" />
-			<span class="text-lg font-medium text-center" class:checked={item.status}>{item.text}</span>
-			<button on:click={() => removeFromList(index)}>
+		<div class="flex flex-col border border-gray-300 rounded-md">
+			
+			<span class="text-lg font-medium text-center p-3" class:checked={item.status}>{item.text}</span>
+  <div class="flex items-center justify-between border-t border-gray-300 p-3 bg-gray-200">
+  <input bind:checked={item.status} type="checkbox" />
+			<button>
 				<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-x-lg" viewBox="0 0 16 16">
 					<path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8z" />
 				</svg>
 			</button>
+  </div>
 		</div>
+
 	{/each}
 </div>
 
