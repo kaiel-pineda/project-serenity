@@ -47,8 +47,8 @@
 	{#each todoList as item, index}
 		<div class="flex flex-col border border-gray-300 rounded-md">
 			
-			<span class="text-lg font-medium text-center p-3" class:checked={item.status}>{item.text}</span>
-  <div class="flex items-center justify-between border-t border-gray-300 p-3 bg-gray-200">
+			<span class="text-lg font-medium text-center p-2" class:checked={item.status}>{item.text}</span>
+  <div class="flex items-center justify-between border-t border-gray-300 p-2 bg-gray-200">
   <input bind:checked={item.status} type="checkbox" />
 			<button>
 				<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-x-lg" viewBox="0 0 16 16">
