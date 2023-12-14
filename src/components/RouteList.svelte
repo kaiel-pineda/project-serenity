@@ -50,7 +50,7 @@
 			<span class="text-base font-medium text-center p-2" class:checked={item.status}>{item.text}</span>
   <div class="flex items-center justify-between border-t border-gray-300 p-2 bg-gray-200">
   <input bind:checked={item.status} type="checkbox" />
-			<button>
+<button on:click={() => removeFromList(index)}>
 				<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-x-lg" viewBox="0 0 16 16">
 					<path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8z" />
 				</svg>
