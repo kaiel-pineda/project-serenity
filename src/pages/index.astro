@@ -1,7 +1,4 @@
 ---
-import { Image } from "astro:assets";
-import imageLogo from "../../public/assets/logo.png";
-
 import RouteLocation from "../components/RouteLocation.svelte";
 import RouteList from "../../src/components/RouteList.svelte";
 ---
@@ -13,20 +10,10 @@ import RouteList from "../../src/components/RouteList.svelte";
 		<title>MyRoute | Delivery Verification Helper</title>
 	</head>
 	<body>
-		<header class='bg-[#343a40] p-3'>
-			<div class='container mx-auto px-6'>
-				<div class='flex gap-x-6 items-center'>
-					<div class='h-14 w-14 flex items-center justify-center'>
-						<Image src={imageLogo} alt='Malca-Amit logo.' />
-					</div>
-					<RouteLocation client:load />
-				</div>
-			</div>
-		</header>
-		<div class='container mx-auto px-6'>
-			<div class='flex flex-col items-center'>
-				<RouteList client:load />
-			</div>
+		<div class='flex flex-col h-screen'>
+			<RouteLocation client:load />
+
+			<RouteList client:load />
 		</div>
 	</body>
 </html>
