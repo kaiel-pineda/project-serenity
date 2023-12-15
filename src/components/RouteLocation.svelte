@@ -44,7 +44,7 @@
 	<div class="container mx-auto px-6">
 		<div class="flex items-center gap-x-6">
 			<div class="h-14 w-14 flex items-center justify-center">
-				<img src="../../public/assets/logo.png" alt="Malca-Amit logo." />
+				<img src="https://raw.githubusercontent.com/kaiel-pineda/project-serenity/main/public/assets/logo.png" alt="Malca-Amit logo." />
 			</div>
 			<span class="text-white font-medium text-xl bg-transparent min-w-[12rem]" contenteditable="true" bind:this={contentEditable} on:blur={handleBlur}></span>
 		</div>
