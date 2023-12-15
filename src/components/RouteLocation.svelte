@@ -1,34 +1,52 @@
 <script lang="ts">
-  let inputValue = '';
+	let inputValue: string = "";
 
-  // Function to safely use localStorage
-  function safeLocalStorage() {
-    if (typeof window !== 'undefined') {
-      // The code is running in the browser
-      return localStorage;
-    }
-    // Return a dummy storage object when not in a browser environment
-    return {
-      getItem: () => null,
-      setItem: () => {}
-    };
-  }
+	interface SafeStorage {
+		getItem(key: string): string | null;
+		setItem(key: string, value: string): void;
+	}
 
-  const storage = safeLocalStorage();
+	function safeLocalStorage(): SafeStorage {
+		if (typeof window !== "undefined") {
+			return localStorage;
+		}
+		return {
+			getItem: () => null,
+			setItem: () => {},
+		};
+	}
 
-  // Load the value from local storage when the component mounts
-  $: {
-    const savedValue = storage.getItem('savedInput');
-    if (savedValue) {
-      inputValue = savedValue;
-    }
-  }
+	const storage: SafeStorage = safeLocalStorage();
 
-  // Update inputValue when the content of the span changes
-  function handleInput(event) {
-    inputValue = event.target.textContent;
-    storage.setItem('savedInput', inputValue);
-  }
+	$: {
+		const savedValue: string | null = storage.getItem("savedInput");
+		if (savedValue) {
+			inputValue = savedValue;
+		}
+	}
+
+	let contentEditable: HTMLSpanElement | null = null;
+
+	function handleBlur(event: FocusEvent): void {
+		const target = event.target as HTMLSpanElement;
+		inputValue = target.textContent || "";
+		storage.setItem("savedInput", inputValue);
+	}
+
+	$: {
+		if (contentEditable && contentEditable.textContent !== inputValue) {
+			contentEditable.textContent = inputValue;
+		}
+	}
 </script>
 
-<span class='text-white font-medium text-xl bg-transparent' contenteditable="true" bind:innerHTML={inputValue} on:input={handleInput}></span>
+<header class="bg-[#343a40] p-3 mb-12">
+	<div class="container mx-auto px-6">
+		<div class="flex items-center gap-x-6">
+			<div class="h-14 w-14 flex items-center justify-center">
+				<img src="../../public/assets/logo.png" alt="Malca-Amit logo." />
+			</div>
+			<span class="text-white font-medium text-xl bg-transparent min-w-[12rem]" contenteditable="true" bind:this={contentEditable} on:blur={handleBlur}></span>
+		</div>
+	</div>
+</header>
