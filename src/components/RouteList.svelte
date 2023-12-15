@@ -50,7 +50,7 @@
 			</button>
 		</div>
 
-		<div class="mt-12 grid grid-cols-2 gap-y-6 gap-x-6 w-full items-center">
+		<div class="grid grid-cols-2 gap-y-6 gap-x-6 w-full items-center">
 			{#each todoList as item, index}
 				<div class="flex flex-col border border-gray-300 rounded-md">
 					<span class="text-base font-medium text-center p-2" class:checked={item.status}>{item.text}</span>
