@@ -40,7 +40,7 @@
 	}
 </script>
 
-<header class="bg-[#343a40] p-3 mb-12">
+<header class="bg-[#343a40] p-3 mb-6">
 	<div class="container mx-auto px-6">
 		<div class="flex items-center gap-x-6">
 			<div class="h-14 w-14 flex items-center justify-center">
