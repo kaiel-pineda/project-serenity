@@ -55,7 +55,7 @@
 </script>
 
 <section class="container mx-auto px-6">
-	<div class="flex flex-col gap-y-12">
+	<div class="flex flex-col gap-y-6">
 		<div class="flex flex-col gap-y-6">
 			{#if showInput}
 				<div class="relative">
