@@ -80,7 +80,7 @@
 			{#each paginatedList as item, paginatedIndex (paginatedIndex)}
 				<div class="flex flex-col border border-gray-300 rounded-md">
 					<span class="text-base font-medium text-center p-2" class:checked={item.status}>{item.text}</span>
-					<div class="flex items-center justify-between border-t border-gray-300 p-2 bg-neutral-100">
+					<div class="flex items-center justify-between border-t rounded-b-md border-gray-300 p-2 bg-neutral-100">
 						<input bind:checked={item.status} type="checkbox" on:change={() => updateItemStatus(paginatedIndex, item.status)} />
 						<button on:click={() => removeFromList(item.id)}>
 							<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-x-lg" viewBox="0 0 16 16">
