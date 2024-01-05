@@ -56,7 +56,6 @@
 
 <section class="container mx-auto px-6">
 	<div class="flex flex-col gap-y-6">
-		<div class="flex flex-col gap-y-6">
 			{#if showInput}
 				<div class="relative">
 					<input class="border-2 border-black rounded-md h-20 w-full p-4 text-xl" bind:value={newItem} type="text" placeholder="Create stop" />
@@ -67,13 +66,11 @@
 					</button>
 				</div>
 			{/if}
-			<div class="self-end">
-<div class="flex w-full items-center justify-between gap-x-3">
+
+<div class="flex items-center justify-between gap-x-3">
 <span class="text-lg font-medium">{todoList.length} stops</span>
 <button class="p-3 border border-gray-200 rounded-md bg-neutral-100" on:click={toggleInputVisibility}>{showInput ? "Hide" : "Show"}</button>
 </div>
-			</div>
-		</div>
 
 		<div class="grid grid-cols-2 gap-y-6 gap-x-6 w-full items-center">
 			{#each paginatedList as item, paginatedIndex (paginatedIndex)}
