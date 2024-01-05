@@ -68,12 +68,11 @@
 				</div>
 			{/if}
 			<div class="self-end">
-				<button class="p-3 border border-gray-200 rounded-md bg-neutral-100" on:click={toggleInputVisibility}>{showInput ? "Hide" : "Show"}</button>
+<div class="flex items-center justify-between gap-x-3">
+<button class="p-3 border border-gray-200 rounded-md bg-neutral-100" on:click={toggleInputVisibility}>{showInput ? "Hide" : "Show"}</button>
+<span class="text-lg font-medium">{todoList.length} stops</span>
+</div>
 			</div>
-		</div>
-
-		<div>
-			<span class="text-lg font-medium">{todoList.length} stops</span>
 		</div>
 
 		<div class="grid grid-cols-2 gap-y-6 gap-x-6 w-full items-center">
