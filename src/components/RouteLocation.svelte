@@ -1,5 +1,5 @@
 <script lang="ts">
-    let locations = ['550 Building', 'Beverly Hills', 'Desert', 'GIA', 'Out of Area', 'Streets', 'Valley];
+    let locations = ['550 Building', 'Beverly Hills', 'Desert', 'GIA', 'Out of Area', 'Streets', 'Valley'];
     let selectedLocation = '';
 
     interface SafeStorage {
