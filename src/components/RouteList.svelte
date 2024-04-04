@@ -100,7 +100,13 @@
 							on:keydown={(e) => {if (e.key === 'Enter') editItem(item.id, item.text)}}
 						/>
 					{:else}
-						<span class={item.status ? 'text-base font-medium text-center p-2 line-through' : 'text-base font-medium text-center p-2'} on:click={() => toggleEdit(item.id)}>{item.text}</span>
+						<span class={item.status ? 'text-base font-medium text-center p-2 line-through' : 'text-base font-medium text-center p-2'} 
+                                                      on:click={(event) => {
+                                                          event.stopPropagation();
+                                                          toggleEdit(item.id);
+                                                      }}>
+                                                        {item.text}
+                                                </span>
 					{/if}
 					<div class="flex items-center justify-between border-t rounded-b-md border-gray-300 p-2 bg-neutral-100">
 						<input bind:checked={item.status} type="checkbox" on:change={() => updateItemStatus(paginatedIndex, item.status)} />
