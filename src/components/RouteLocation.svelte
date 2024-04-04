@@ -1,5 +1,5 @@
 <script lang="ts">
-    let locations = ['550 Building', 'Beverly Hills', 'Desert', 'GIA', 'Out of Area', 'Streets', 'Valley', 'Custom'];
+    let locations = ['550 Building', 'Beverly Hills', 'Desert', 'GIA', 'Out of Area', 'Streets', 'Valley];
     let selectedLocation = '';
 
     interface SafeStorage {
@@ -19,16 +19,19 @@
 
     const storage: SafeStorage = safeLocalStorage();
 
-    // Load the saved location from local storage
+    // Initialize selectedLocation from local storage or default
     $: {
-        const savedLocation = storage.getItem("savedLocation");
-        if (savedLocation) {
-            selectedLocation = savedLocation;
-        } else {
-            selectedLocation = locations[0]; // Default to the first location if nothing is saved
+        selectedLocation = storage.getItem("savedLocation") || locations[0];
+    }
+
+    // Update local storage whenever selectedLocation changes
+    $: {
+        if (selectedLocation) {
+            storage.setItem('savedLocation', selectedLocation);
         }
     }
 
+    // You can also handle changes directly in the select's onchange event if preferred
     function handleLocationChange() {
         storage.setItem('savedLocation', selectedLocation);
     }
