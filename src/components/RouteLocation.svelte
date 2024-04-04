@@ -1,11 +1,10 @@
 <script lang="ts">
     let inputValue: string = "";
     let locations = ['550 Building', 'Beverly Hills', 'Desert', 'GIA', 'Out of Area', 'Streets', 'Valley', 'Custom'];
-    let selectedLocation = '550 Building'; // Default or load from storage
+    let selectedLocation = ''; // Initialize with a default or load from storage
     let customLocation = '';
     let showCustomInput = false;
 
-    // Define safeStorage handling
     interface SafeStorage {
         getItem(key: string): string | null;
         setItem(key: string, value: string): void;
@@ -32,7 +31,6 @@
         if (savedLocation) {
             selectedLocation = savedLocation;
             showCustomInput = selectedLocation === 'Custom';
-            if (showCustomInput) customLocation = savedValue || '';
         }
     }
 
@@ -45,7 +43,7 @@
 
     $: if (showCustomInput && customLocation === '') {
         showCustomInput = false;
-        selectedLocation = locations[0]; // Default to the first location or any logic you prefer
+        selectedLocation = ''; // Reset or set to a default value as needed
     }
 
     let contentEditable: HTMLSpanElement | null = null;
@@ -56,7 +54,7 @@
         storage.setItem("savedInput", inputValue);
     }
 
-    // Reactive handling for content editable
+    // Ensure contentEditable updates are properly handled
     $: if (contentEditable && inputValue !== contentEditable.textContent) {
         contentEditable.textContent = inputValue;
     }
@@ -77,8 +75,8 @@
             {/if}
             {#if showCustomInput}
                 <input type="text" bind:value={customLocation} placeholder="Enter custom location"
-                       on:input={() => {
-                           customLocation = $event.target.value;
+                       on:input={(event) => {
+                           customLocation = event.target.value;
                            storage.setItem('savedLocation', customLocation);
                        }} />
             {/if}
