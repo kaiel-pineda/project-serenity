@@ -90,30 +90,28 @@
 
 		<div class="grid grid-cols-2 gap-y-6 gap-x-6 w-full items-center">
 			{#each paginatedList as item, paginatedIndex (paginatedIndex)}
-				<{#each paginatedList as item, paginatedIndex (paginatedIndex)}
-    <div class="flex flex-col border border-gray-300 rounded-md">
-        {#if item.isEditing}
-            <input
-                class="text-base font-medium text-center p-2"
-                type="text"
-                bind:value={item.text}
-                on:blur={() => editItem(item.id, item.text)}
-                on:keydown={(e) => {if (e.key === 'Enter') editItem(item.id, item.text)}}
-            />
-        {:else}
-            <span class={item.status ? 'text-base font-medium text-center p-2 line-through' : 'text-base font-medium text-center p-2'} on:click={() => toggleEdit(item.id)}>{item.text}</span>
-        {/if}
-        <div class="flex items-center justify-between border-t rounded-b-md border-gray-300 p-2 bg-neutral-100">
-            <input bind:checked={item.status} type="checkbox" on:change={() => updateItemStatus(paginatedIndex, item.status)} />
-            <button on:click={() => removeFromList(item.id)}>
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-                    <path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8z" />
-                </svg>
-            </button>
-        </div>
-    </div>
-{/each}
-
+				<div class="flex flex-col border border-gray-300 rounded-md">
+					{#if item.isEditing}
+						<input
+							class="text-base font-medium text-center p-2"
+							type="text"
+							bind:value={item.text}
+							on:blur={() => editItem(item.id, item.text)}
+							on:keydown={(e) => {if (e.key === 'Enter') editItem(item.id, item.text)}}
+						/>
+					{:else}
+						<span class={item.status ? 'text-base font-medium text-center p-2 line-through' : 'text-base font-medium text-center p-2'} on:click={() => toggleEdit(item.id)}>{item.text}</span>
+					{/if}
+					<div class="flex items-center justify-between border-t rounded-b-md border-gray-300 p-2 bg-neutral-100">
+						<input bind:checked={item.status} type="checkbox" on:change={() => updateItemStatus(paginatedIndex, item.status)} />
+						<button on:click={() => removeFromList(item.id)}>
+							<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-x-lg" viewBox="0 0 16 16">
+								<path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8z" />
+							</svg>
+						</button>
+					</div>
+				</div>
+			{/each}
 		</div>
 
 		{#if totalPages > 1}
@@ -129,9 +127,3 @@
 		</div>
 	</div>
 </section>
-
-<style>
-	.checked {
-		text-decoration: line-through;
-	}
-</style>
