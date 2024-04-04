@@ -3,6 +3,7 @@
     let locations = ['550 Building', 'Beverly Hills', 'Desert', 'GIA', 'Out of Area', 'Streets', 'Valley', 'Custom'];
     let selectedLocation = '';
     let customLocation = '';
+    let showCustomInput = false;
 
     interface SafeStorage {
         getItem(key: string): string | null;
@@ -21,15 +22,26 @@
 
     const storage: SafeStorage = safeLocalStorage();
 
-    // Load saved data
+    // Initialize from saved values
     $: {
-        const savedValue: string | null = storage.getItem("savedInput");
-        if (savedValue) {
-            inputValue = savedValue;
-        }
-        const savedLocation: string | null = storage.getItem("savedLocation");
+        const savedValue = storage.getItem("savedInput");
+        if (savedValue) inputValue = savedValue;
+
+        const savedLocation = storage.getItem("savedLocation");
         if (savedLocation) {
             selectedLocation = savedLocation;
+            showCustomInput = selectedLocation === 'Custom';
+        }
+    }
+
+    function handleLocationChange() {
+        if (selectedLocation === 'Custom') {
+            showCustomInput = true;
+            customLocation = '';
+        } else {
+            showCustomInput = false;
+            customLocation = selectedLocation;
+            storage.setItem('savedLocation', selectedLocation);
         }
     }
 
@@ -41,19 +53,9 @@
         storage.setItem("savedInput", inputValue);
     }
 
-    // Logic to toggle custom location input
-    $: showCustomInput = selectedLocation === 'Custom';
-    $: if (showCustomInput && customLocation === '') {
-        selectedLocation = '';
-    } else if (showCustomInput) {
-        storage.setItem('savedLocation', customLocation);
-    }
-
-    // Update the contentEditable text when inputValue changes
-    $: {
-        if (contentEditable && contentEditable.textContent !== inputValue) {
-            contentEditable.textContent = inputValue;
-        }
+    // Ensure contentEditable updates are properly handled
+    $: if (contentEditable && inputValue !== contentEditable.textContent) {
+        contentEditable.textContent = inputValue;
     }
 </script>
 
@@ -63,13 +65,13 @@
             <div class="h-14 w-14 flex items-center justify-center">
                 <img src="https://raw.githubusercontent.com/kaiel-pineda/project-serenity/main/public/assets/logo.png" alt="Malca-Amit logo." />
             </div>
-            <select bind:value={selectedLocation}>
+            <select bind:value={selectedLocation} on:change={handleLocationChange}>
                 {#each locations as location}
                     <option value={location}>{location}</option>
                 {/each}
             </select>
             {#if showCustomInput}
-                <input type="text" bind:value={customLocation} placeholder="Enter custom location" />
+                <input type="text" bind:value={customLocation} placeholder="Enter custom location" on:input={() => storage.setItem('savedLocation', customLocation)}>
             {/if}
             <span class="text-white font-medium text-xl bg-transparent min-w-[12rem]" contenteditable="true" bind:this={contentEditable} on:blur={handleBlur}></span>
         </div>
