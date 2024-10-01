@@ -122,7 +122,7 @@
 </script>
 
 <main class="flex flex-col gap-y-6 mt-6 h-full w-full">
-	<div class="flex flex-col gap-y-12 flex-1">
+	<div class="flex flex-col gap-y-6 flex-1">
 		<header>
 			<div class="container mx-auto px-6">
 				<div class="flex items-center justify-between gap-x-3">
@@ -137,9 +137,9 @@
 
 		<section>
 			<div class="container mx-auto px-6">
-				<div class="grid w-full grid-cols-2 items-center gap-x-6 gap-y-6">
+				<div class="masonry-container">
 					{#each paginatedList as item (item.id)}
-						<div class="flex flex-col rounded-lg bg-outer-space-50 text-black">
+						<div class="masonry-item flex flex-col rounded-lg bg-outer-space-50 text-black">
 							{#if item.isEditing}
 								<input
 									class="p-3 text-center text-lg font-medium bg-transparent"
@@ -196,7 +196,7 @@
 				</div>
 
 				{#if totalPages > 1}
-					<div class="pagination-controls mt-12 flex items-center justify-center gap-6">
+					<div class="pagination-controls mt-6 flex items-center justify-center gap-6">
 						<button class="rounded-full bg-outer-space-500 text-outer-space-100 py-3 px-6" disabled={currentPage === 1} on:click={() => goToPage(currentPage - 1)}> Previous </button>
 						<span>{currentPage} of {totalPages}</span>
 						<button class="rounded-full bg-outer-space-500 text-outer-space-100 py-3 px-6" disabled={currentPage === totalPages} on:click={() => goToPage(currentPage + 1)}> Next </button>
@@ -206,7 +206,7 @@
 		</section>
 	</div>
 
-	<footer class="sticky bottom-0 bg-white">
+	<footer class={showInput ? "sticky bottom-0 bg-white" : "sticky bottom-0 bg-transparent"}>
 		<div class="container mx-auto px-6">
 			<div class="flex flex-col justify-center mb-6">
 				<div class="flex justify-between items-center w-full gap-x-6">
@@ -239,3 +239,21 @@
 		</div>
 	</footer>
 </main>
+
+<style>
+	.masonry-container {
+		column-count: 2;
+		column-gap: 1.5rem;
+	}
+
+	.masonry-item {
+		break-inside: avoid;
+		margin-bottom: 1.5rem;
+		overflow: hidden;
+		word-wrap: break-word;
+	}
+
+	.masonry-item > * {
+		max-width: 100%;
+	}
+</style>
