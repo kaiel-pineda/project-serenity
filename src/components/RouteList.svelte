@@ -137,9 +137,9 @@
 
 		<section>
 			<div class="container mx-auto px-6">
-				<div class="masonry-container">
+				<div class="columns-2 gap-x-6">
 					{#each paginatedList as item (item.id)}
-						<div class="masonry-item flex flex-col rounded-lg bg-outer-space-50 text-black">
+						<div class="break-inside-avoid mb-6 overflow-hidden break-words *:max-w-full flex flex-col rounded-lg bg-outer-space-50 text-black">
 							{#if item.isEditing}
 								<input
 									class="p-3 text-center text-lg font-medium bg-transparent"
@@ -239,21 +239,3 @@
 		</div>
 	</footer>
 </main>
-
-<style>
-	.masonry-container {
-		column-count: 2;
-		column-gap: 1.5rem;
-	}
-
-	.masonry-item {
-		break-inside: avoid;
-		margin-bottom: 1.5rem;
-		overflow: hidden;
-		word-wrap: break-word;
-	}
-
-	.masonry-item > * {
-		max-width: 100%;
-	}
-</style>
