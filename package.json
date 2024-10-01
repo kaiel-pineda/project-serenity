@@ -13,10 +13,10 @@
 		"@astrojs/check": "^0.3.1",
 		"@astrojs/svelte": "^5.0.0",
 		"@astrojs/tailwind": "^5.0.3",
+		"@fontsource-variable/open-sans": "^5.1.0",
 		"astro": "^4.14.2",
 		"svelte": "^4.2.18",
 		"tailwindcss": "^3.3.6",
-		"tailwindcss-fluid-type": "^2.0.3",
 		"typescript": "^5.3.3"
 	}
 }
