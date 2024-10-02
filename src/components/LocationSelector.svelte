@@ -73,7 +73,7 @@
 			{#if !isMobile}
 				<button {...dropdownTrigger} use:dropdownTrigger>
 					<div class="flex items-center justify-between gap-x-1">
-						<span class="text-base/normal font-medium">
+						<span class="text-lg/normal font-medium">
 							{selectedLocation}
 						</span>
 
@@ -84,7 +84,7 @@
 				</button>
 				{#if $isDropdownOpen}
 					<div class="absolute inset-0 z-50" {...dropdownOverlay} use:dropdownOverlay></div>
-					<div class="absolute z-50 mt-3 min-w-52 rounded-lg bg-outer-space-50 py-3 shadow-lg" {...dropdownMenu} use:dropdownMenu transition:fly={{ duration: 200, y: -5 }}>
+					<div class="absolute z-50 mt-3 min-w-52 rounded-lg bg-outer-space-100 py-3 shadow-lg" {...dropdownMenu} use:dropdownMenu transition:fly={{ duration: 200, y: -5 }}>
 						{#each locations as location}
 							<button class="block w-full p-3 text-sm/normal text-left font-medium" {...dropdownItem} use:dropdownItem on:click={() => selectLocation(location)}>
 								{location}
@@ -95,7 +95,7 @@
 			{:else}
 				<button {...dialogTrigger} use:dialogTrigger>
 					<div class="flex items-center justify-between gap-x-1">
-						<span class="text-base/normal font-medium">
+						<span class="text-lg/normal font-medium">
 							{selectedLocation}
 						</span>
 
@@ -107,7 +107,7 @@
 				{#if $isDialogOpen}
 					<div class="fixed inset-0 z-50 bg-black/50" {...dialogOverlay} use:dialogOverlay transition:fade={{ duration: 150 }}></div>
 					<div
-						class="fixed inset-x-0 bottom-0 z-50 w-full rounded-t-3xl bg-outer-space-50 p-6"
+						class="fixed inset-x-0 bottom-0 z-50 w-full rounded-t-3xl bg-outer-space-100 p-6"
 						{...dialogContent}
 						use:dialogContent
 						transition:fly={{
