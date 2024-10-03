@@ -7,6 +7,7 @@
 	const locations: string[] = ["550 Building", "Beverly Hills", "Desert", "GIA", "Out of Area", "Streets", "Valley"];
 	let selectedLocation: string = locations[0];
 	let isMobile = false;
+	let mounted = false;
 
 	const {
 		elements: { trigger: dropdownTrigger, menu: dropdownMenu, item: dropdownItem, overlay: dropdownOverlay },
@@ -48,6 +49,7 @@
 				selectedLocation = savedLocation;
 			}
 		}
+		mounted = true;
 	});
 
 	onDestroy(() => {
@@ -56,7 +58,7 @@
 		}
 	});
 
-	$: if (typeof window !== "undefined") {
+	$: if (typeof window !== "undefined" && mounted) {
 		localStorage.setItem("savedLocation", selectedLocation);
 	}
 </script>
