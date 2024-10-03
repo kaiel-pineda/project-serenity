@@ -11,45 +11,22 @@
 	let newItem = "";
 	let stopList: StopItem[] = [];
 	let paginatedList: StopItem[] = [];
-
 	let currentPage = 1;
 	const itemsPerPage = 12;
 	let totalPages = 1;
+	let showInput = true;
 
 	onMount(() => {
 		if (typeof window !== "undefined") {
 			const savedList = localStorage.getItem("stopList");
 			if (savedList) {
-				stopList = JSON.parse(savedList).map((item: StopItem) => ({
-					...item,
-					isEditing: false,
-				}));
-				totalPages = Math.ceil(stopList.length / itemsPerPage) || 1;
-				updatePaginatedList();
+				stopList = JSON.parse(savedList).map((item: StopItem) => ({ ...item, isEditing: false }));
+				updatePagination();
 			}
 		}
 	});
 
-	function addToList(): void {
-		const trimmedItem = newItem.trim();
-		if (trimmedItem) {
-			const newStop: StopItem = {
-				id: Date.now(),
-				text: trimmedItem,
-				status: false,
-				isEditing: false,
-			};
-			stopList = [...stopList, newStop];
-			newItem = "";
-			updateLocalStorage();
-			totalPages = Math.ceil(stopList.length / itemsPerPage) || 1;
-			goToPage(totalPages);
-		}
-	}
-
-	function removeFromList(itemId: number): void {
-		stopList = stopList.filter((item) => item.id !== itemId);
-		updateLocalStorage();
+	function updatePagination() {
 		totalPages = Math.ceil(stopList.length / itemsPerPage) || 1;
 		if (currentPage > totalPages) {
 			currentPage = totalPages;
@@ -57,65 +34,72 @@
 		updatePaginatedList();
 	}
 
-	function updateItemStatus(itemId: number, status: boolean): void {
-		const item = stopList.find((item) => item.id === itemId);
-		if (item) {
-			item.status = status;
-			stopList = stopList;
-			updateLocalStorage();
-		}
+	function updatePaginatedList() {
+		const start = (currentPage - 1) * itemsPerPage;
+		const end = currentPage * itemsPerPage;
+		paginatedList = stopList.slice(start, end);
 	}
 
-	function toggleEdit(itemId: number): void {
-		const item = stopList.find((item) => item.id === itemId);
-		if (item) {
-			item.isEditing = !item.isEditing;
-			stopList = stopList;
-			updatePaginatedList();
-		}
-	}
-
-	function editItem(itemId: number, newText: string): void {
-		const item = stopList.find((item) => item.id === itemId);
-		if (item) {
-			item.text = newText;
-			item.isEditing = false;
-			stopList = stopList;
-			updateLocalStorage();
-			updatePaginatedList();
-		}
-	}
-
-	function clearAll(): void {
-		stopList = [];
-		updateLocalStorage();
-		totalPages = 1;
-		currentPage = 1;
-		updatePaginatedList();
-	}
-
-	function updateLocalStorage(): void {
+	function updateLocalStorage() {
 		if (typeof window !== "undefined") {
 			localStorage.setItem("stopList", JSON.stringify(stopList));
 		}
 	}
 
-	function updatePaginatedList(): void {
-		paginatedList = stopList.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
+	function addToList() {
+		const trimmedItem = newItem.trim();
+		if (!trimmedItem) return;
+
+		stopList = [...stopList, { id: Date.now(), text: trimmedItem, status: false, isEditing: false }];
+		newItem = "";
+		updateLocalStorage();
+		updatePagination();
+		goToPage(totalPages);
 	}
 
-	function goToPage(page: number): void {
-		currentPage = page;
+	function removeFromList(itemId: number) {
+		stopList = stopList.filter((item) => item.id !== itemId);
+		updateLocalStorage();
+		updatePagination();
+	}
+
+	function updateItem(itemId: number, updatedFields: Partial<StopItem>) {
+		stopList = stopList.map((item) => (item.id === itemId ? { ...item, ...updatedFields } : item));
+		updateLocalStorage();
 		updatePaginatedList();
 	}
 
-	let showInput = true;
+	function toggleStatus(itemId: number) {
+		updateItem(itemId, { status: !stopList.find((item) => item.id === itemId)?.status });
+	}
 
-	function toggleInputVisibility(): void {
+	function toggleEdit(itemId: number) {
+		updateItem(itemId, { isEditing: !stopList.find((item) => item.id === itemId)?.isEditing });
+	}
+
+	function editItem(itemId: number, newText: string) {
+		updateItem(itemId, { text: newText, isEditing: false });
+	}
+
+	function clearAll() {
+		stopList = [];
+		updateLocalStorage();
+		currentPage = 1;
+		updatePagination();
+	}
+
+	function goToPage(page: number) {
+		if (page >= 1 && page <= totalPages) {
+			currentPage = page;
+			updatePaginatedList();
+		}
+	}
+
+	function toggleInputVisibility() {
 		showInput = !showInput;
 	}
 
-	function getStopLabel(count: number): string {
+	function getStopLabel(count: number) {
 		if (count === 0) return "No Stops";
 		if (count === 1) return "1 Stop";
 		return `${count} Stops`;
@@ -127,7 +111,9 @@
 		<header>
 			<div class="container mx-auto px-6">
 				<div class="flex items-center justify-between gap-x-3">
-					<span class="text-xl font-semibold">{getStopLabel(stopList.length)}</span>
+					<span class="text-xl font-semibold">
+						{getStopLabel(stopList.length)}
+					</span>
 					<div class="justify-end">
 						<button class="rounded-full bg-[#ceb202] py-3 px-4 font-medium text-white text-base" on:click={clearAll}>Clear All</button>
 					</div>
@@ -139,45 +125,29 @@
 			<div class="container mx-auto px-6">
 				<div class="columns-2 gap-x-6">
 					{#each paginatedList as item (item.id)}
-						<!-- Stop Item -->
-						<div class="break-inside-avoid mb-6 overflow-hidden break-words max-w-full flex flex-col rounded-lg bg-outer-space-50 text-black">
-							{#if item.isEditing}
-								<input
-									class="p-3 text-center text-lg font-medium bg-transparent"
-									type="text"
-									bind:value={item.text}
-									on:blur={() => editItem(item.id, item.text)}
-									on:keydown={(e) => {
-										if (e.key === "Enter") editItem(item.id, item.text);
-									}}
-								/>
-							{:else}
-								<span
-									class="p-3 text-center text-lg font-medium {item.status ? 'line-through' : ''}"
-									on:click={() => toggleEdit(item.id)}
-									role="button"
-									tabindex="0"
-									on:keydown={(e) => {
-										if (e.key === "Enter" || e.key === " ") {
-											e.preventDefault();
-											toggleEdit(item.id);
-										}
-									}}
-								>
-									{item.text}
-								</span>
-							{/if}
-							<div class="flex items-center justify-between rounded-b-lg bg-outer-space-50 p-3">
-								<input type="checkbox" bind:checked={item.status} on:change={() => updateItemStatus(item.id, item.status)} />
-								<button on:click={() => removeFromList(item.id)}>
+						<div class="break-inside-avoid mb-6 overflow-hidden break-words max-w-full flex flex-col gap-y-3 items-center justify-between rounded-lg {item.status ? 'bg-outer-space-200' : 'bg-outer-space-50'} text-black p-3">
+							<input
+								type="text"
+								bind:value={item.text}
+								class="flex-1 text-center text-lg font-medium bg-transparent {item.status ? 'line-through' : ''}"
+								readonly={!item.isEditing}
+								on:click={() => toggleEdit(item.id)}
+								on:blur={() => editItem(item.id, item.text)}
+								on:keydown={(e) => {
+									if (e.key === "Enter") editItem(item.id, item.text);
+								}}
+							/>
+							<div class="flex items-center justify-between gap-x-3 w-full">
+								<button type="button" on:click={() => toggleStatus(item.id)} class="size-6 flex items-center justify-center rounded-full border transition-all duration-200 {item.status ? 'bg-blue-500 border-blue-500' : 'border-neutral-500 bg-transparent'}" aria-pressed={item.status}>
+									{#if item.status}
+										<svg xmlns="http://www.w3.org/2000/svg" class="size-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
+											<path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+										</svg>
+									{/if}
+								</button>
+								<button on:click={() => removeFromList(item.id)} class="p-3">
 									<svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" class="size-4" viewBox="0 0 16 16">
-										<path
-											d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 
-                         0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 
-                         0 0 1-.708.708L8 
-                         8.707l-5.146 5.147a.5.5 
-                         0 0 1-.708-.708L7.293 8z"
-										/>
+										<path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8z" />
 									</svg>
 								</button>
 							</div>
@@ -187,9 +157,9 @@
 
 				{#if totalPages > 1}
 					<div class="pagination-controls mt-6 flex items-center justify-center gap-6">
-						<button class="rounded-full bg-outer-space-500 text-outer-space-100 py-3 px-6" disabled={currentPage === 1} on:click={() => goToPage(currentPage - 1)}>Previous</button>
+						<button class="rounded-full bg-outer-space-500 text-outer-space-100 py-3 px-6" disabled={currentPage === 1} on:click={() => goToPage(currentPage - 1)}> Previous </button>
 						<span>{currentPage} of {totalPages}</span>
-						<button class="rounded-full bg-outer-space-500 text-outer-space-100 py-3 px-6" disabled={currentPage === totalPages} on:click={() => goToPage(currentPage + 1)}>Next</button>
+						<button class="rounded-full bg-outer-space-500 text-outer-space-100 py-3 px-6" disabled={currentPage === totalPages} on:click={() => goToPage(currentPage + 1)}> Next </button>
 					</div>
 				{/if}
 			</div>
@@ -210,7 +180,7 @@
 								class="bg-transparent w-full outline-none placeholder:text-neutral-300 text-neutral-100 text-base font-medium ml-3"
 								bind:value={newItem}
 								type="text"
-								placeholder="Create a stop here"
+								placeholder="Create a stop"
 								on:keydown={(e) => {
 									if (e.key === "Enter") addToList();
 								}}

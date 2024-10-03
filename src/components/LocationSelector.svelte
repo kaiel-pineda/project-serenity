@@ -118,7 +118,7 @@
 						}}
 					>
 						<div class="flex flex-col gap-y-3">
-							<h3 class="my-3 text-left text-lg font-semibold">Select Location</h3>
+							<h3 class="my-3 text-left text-base/normal font-semibold">Select Location</h3>
 							<div class="flex flex-col">
 								{#each locations as location}
 									<button class="block w-full py-3 text-lg/normal text-left font-medium" on:click={() => selectLocation(location)}>
