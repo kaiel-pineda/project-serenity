@@ -104,6 +104,13 @@
 		if (count === 1) return "1 Stop";
 		return `${count} Stops`;
 	}
+
+	export function focusInput(node: HTMLInputElement) {
+		requestAnimationFrame(() => {
+			node.focus();
+			node.select();
+		});
+	}
 </script>
 
 <main class="flex flex-col gap-y-6 mt-6 h-full w-full">
@@ -126,17 +133,34 @@
 				<div class="columns-2 gap-x-6">
 					{#each paginatedList as item (item.id)}
 						<div class="break-inside-avoid mb-6 overflow-hidden break-words max-w-full flex flex-col gap-y-3 items-center justify-between rounded-lg {item.status ? 'bg-outer-space-200' : 'bg-outer-space-50'} text-black p-3">
-							<input
-								type="text"
-								bind:value={item.text}
-								class="flex-1 text-center text-lg font-medium bg-transparent {item.status ? 'line-through' : ''}"
-								readonly={!item.isEditing}
-								on:click={() => toggleEdit(item.id)}
-								on:blur={() => editItem(item.id, item.text)}
-								on:keydown={(e) => {
-									if (e.key === "Enter") editItem(item.id, item.text);
-								}}
-							/>
+							{#if item.isEditing}
+								<input
+									id={"input-" + item.id}
+									class="p-3 text-center text-lg font-medium bg-transparent w-full"
+									type="text"
+									bind:value={item.text}
+									on:blur={() => editItem(item.id, item.text)}
+									on:keydown={(e) => {
+										if (e.key === "Enter") editItem(item.id, item.text);
+									}}
+									use:focusInput
+								/>
+							{:else}
+								<span
+									class="p-3 text-center text-lg font-medium {item.status ? 'line-through' : ''}"
+									on:click={() => toggleEdit(item.id)}
+									role="button"
+									tabindex="0"
+									on:keydown={(e) => {
+										if (e.key === "Enter" || e.key === " ") {
+											e.preventDefault();
+											toggleEdit(item.id);
+										}
+									}}
+								>
+									{item.text}
+								</span>
+							{/if}
 							<div class="flex items-center justify-between gap-x-3 w-full">
 								<button type="button" on:click={() => toggleStatus(item.id)} class="size-6 flex items-center justify-center rounded-full border transition-all duration-200 {item.status ? 'bg-blue-500 border-blue-500' : 'border-neutral-500 bg-transparent'}" aria-pressed={item.status}>
 									{#if item.status}
