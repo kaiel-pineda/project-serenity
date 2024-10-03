@@ -169,9 +169,11 @@
 										</svg>
 									{/if}
 								</button>
-								<button on:click={() => removeFromList(item.id)} class="p-3">
-									<svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" class="size-4" viewBox="0 0 16 16">
-										<path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8z" />
+								<button on:click={() => removeFromList(item.id)}>
+									<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="size-6 stroke-neutral-500">
+										<path d="M21 4H8l-7 8 7 8h13a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2z" />
+										<line x1="18" y1="9" x2="12" y2="15" />
+										<line x1="12" y1="9" x2="18" y2="15" />
 									</svg>
 								</button>
 							</div>
