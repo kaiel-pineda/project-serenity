@@ -13,15 +13,13 @@
 		elements: { trigger: dropdownTrigger, menu: dropdownMenu, item: dropdownItem, overlay: dropdownOverlay },
 		states: { open: isDropdownOpen },
 	} = createDropdownMenu({
-		closeOnOutsideClick: true,
 		forceVisible: true,
 	});
 
 	const {
-		elements: { trigger: dialogTrigger, overlay: dialogOverlay, content: dialogContent, close: dialogClose },
+		elements: { trigger: dialogTrigger, overlay: dialogOverlay, content: dialogContent },
 		states: { open: isDialogOpen },
 	} = createDialog({
-		closeOnOutsideClick: true,
 		forceVisible: true,
 	});
 
@@ -73,41 +71,31 @@
 				</svg>
 			</div>
 			{#if !isMobile}
-				<button {...dropdownTrigger} use:dropdownTrigger>
-					<div class="flex items-center justify-between gap-x-1">
-						<span class="text-lg/normal font-medium">
-							{selectedLocation}
-						</span>
-
-						<svg xmlns="http://www.w3.org/2000/svg" class="size-6" fill="currentColor" viewBox="0 -960 960 960">
-							<path xmlns="http://www.w3.org/2000/svg" d="M480-360 280-560h400L480-360Z" />
-						</svg>
-					</div>
+				<button {...dropdownTrigger} use:dropdownTrigger class="flex items-center justify-between gap-x-1">
+					<span class="text-xl/normal font-semibold">{selectedLocation}</span>
+					<svg xmlns="http://www.w3.org/2000/svg" class="size-6" fill="currentColor" viewBox="0 -960 960 960">
+						<path xmlns="http://www.w3.org/2000/svg" d="M480-360 280-560h400L480-360Z" />
+					</svg>
 				</button>
 				{#if $isDropdownOpen}
-					<div class="absolute inset-0 z-50" {...dropdownOverlay} use:dropdownOverlay></div>
+					<div class="absolute inset-0 z-50" {...dropdownOverlay} use:dropdownOverlay />
 					<div class="absolute z-50 mt-3 min-w-52 rounded-lg bg-outer-space-100 py-3 shadow-lg" {...dropdownMenu} use:dropdownMenu transition:fly={{ duration: 200, y: -5 }}>
 						{#each locations as location}
-							<button class="block w-full p-3 text-sm/normal text-left font-medium" {...dropdownItem} use:dropdownItem on:click={() => selectLocation(location)}>
+							<button class="block w-full p-3 text-sm text-left font-medium" {...dropdownItem} use:dropdownItem on:click={() => selectLocation(location)}>
 								{location}
 							</button>
 						{/each}
 					</div>
 				{/if}
 			{:else}
-				<button {...dialogTrigger} use:dialogTrigger>
-					<div class="flex items-center justify-between gap-x-1">
-						<span class="text-lg/normal font-medium">
-							{selectedLocation}
-						</span>
-
-						<svg xmlns="http://www.w3.org/2000/svg" class="size-6" fill="currentColor" viewBox="0 -960 960 960">
-							<path xmlns="http://www.w3.org/2000/svg" d="M480-360 280-560h400L480-360Z" />
-						</svg>
-					</div>
+				<button {...dialogTrigger} use:dialogTrigger class="flex items-center justify-between gap-x-1">
+					<span class="text-xl/normal font-semibold">{selectedLocation}</span>
+					<svg xmlns="http://www.w3.org/2000/svg" class="size-6" fill="currentColor" viewBox="0 -960 960 960">
+						<path xmlns="http://www.w3.org/2000/svg" d="M480-360 280-560h400L480-360Z" />
+					</svg>
 				</button>
 				{#if $isDialogOpen}
-					<div class="fixed inset-0 z-50 bg-black/50" {...dialogOverlay} use:dialogOverlay transition:fade={{ duration: 150 }}></div>
+					<div class="fixed inset-0 z-50 bg-black/50" {...dialogOverlay} use:dialogOverlay transition:fade={{ duration: 150 }} />
 					<div
 						class="fixed inset-x-0 bottom-0 z-50 w-full rounded-t-3xl bg-outer-space-100 p-6"
 						{...dialogContent}
@@ -120,10 +108,10 @@
 						}}
 					>
 						<div class="flex flex-col gap-y-3">
-							<h3 class="my-3 text-left text-base/normal font-semibold">Select Location</h3>
+							<h3 class="my-3 text-left text-base font-semibold">Select Location</h3>
 							<div class="flex flex-col">
 								{#each locations as location}
-									<button class="block w-full py-3 text-lg/normal text-left font-medium" on:click={() => selectLocation(location)}>
+									<button class="block w-full py-3 text-lg text-left font-medium" on:click={() => selectLocation(location)}>
 										{location}
 									</button>
 								{/each}
