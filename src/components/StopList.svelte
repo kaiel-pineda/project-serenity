@@ -137,7 +137,7 @@
 						{getStopLabel(stopList.length)}
 					</span>
 					<div class="justify-end">
-						<button class="rounded-full bg-[#ceb202] py-3 px-4 font-medium text-white text-base" on:click={clearAll}> Clear All </button>
+						<button class="rounded-full bg-old-gold-500 py-3 px-4 font-medium text-white text-base/normal" on:click={clearAll}> Clear All </button>
 					</div>
 				</div>
 			</div>
@@ -187,7 +187,7 @@
 								</button>
 								{#if item.note && item.note.trim() !== ""}
 									<div>
-										<svg xmlns="http://www.w3.org/2000/svg" class="size-4 fill-outer-space-500" viewBox="0 0 16 16">
+										<svg xmlns="http://www.w3.org/2000/svg" class="size-4 fill-old-gold-700" viewBox="0 0 16 16">
 											<path d="M2.5 1A1.5 1.5 0 0 0 1 2.5v11A1.5 1.5 0 0 0 2.5 15h6.086a1.5 1.5 0 0 0 1.06-.44l4.915-4.914A1.5 1.5 0 0 0 15 8.586V2.5A1.5 1.5 0 0 0 13.5 1zM2 2.5a.5.5 0 0 1 .5-.5h11a.5.5 0 0 1 .5.5V8H9.5A1.5 1.5 0 0 0 8 9.5V14H2.5a.5.5 0 0 1-.5-.5zm7 11.293V9.5a.5.5 0 0 1 .5-.5h4.293z" />
 										</svg>
 									</div>
@@ -215,7 +215,7 @@
 		</section>
 	</div>
 
-	<footer class={showInput ? "sticky bottom-0 bg-white" : "sticky bottom-0 bg-transparent"}>
+	<footer class={showInput ? "sticky bottom-0 bg-white z-30" : "sticky bottom-0 bg-transparent z-30"}>
 		<div class="container mx-auto px-6">
 			<div class="flex flex-col justify-center mb-6">
 				<div class="flex justify-between items-center w-full gap-x-6">
@@ -226,7 +226,7 @@
 
 						{#if showInput}
 							<input
-								class="bg-transparent w-full outline-none placeholder:text-neutral-300 text-neutral-100 text-base font-medium ml-3"
+								class="bg-transparent w-full outline-none text-xl/normal placeholder:text-neutral-300 text-neutral-100 font-medium ml-3"
 								bind:value={newItem}
 								type="text"
 								placeholder="Create a stop"
