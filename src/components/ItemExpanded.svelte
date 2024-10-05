@@ -1,7 +1,8 @@
 <script lang="ts">
 	import { createEventDispatcher } from "svelte";
 	import { createDialog } from "@melt-ui/svelte";
-	import { fade } from "svelte/transition";
+	import { fade, scale } from "svelte/transition";
+	import { quintOut } from "svelte/easing";
 
 	interface StopItem {
 		id: number;
@@ -33,9 +34,9 @@
 
 {#if $isItemDialogOpen}
 	<div {...$itemDialogPortalled} use:itemDialogPortalled>
-		<div class="fixed inset-0 z-50 bg-black/50" {...$itemDialogOverlay} use:itemDialogOverlay transition:fade={{ duration: 150 }} />
+		<div class="fixed inset-0 z-50 bg-black/50" {...$itemDialogOverlay} use:itemDialogOverlay transition:fade={{ duration: 200, easing: quintOut }} />
 
-		<div class="fixed left-1/2 top-1/2 z-50 transform -translate-x-1/2 -translate-y-1/2 w-full max-w-screen-lg" {...$itemDialogContent} use:itemDialogContent transition:fade>
+		<div class="fixed left-1/2 top-1/2 z-50 transform -translate-x-1/2 -translate-y-1/2 w-full max-w-screen-lg" {...$itemDialogContent} use:itemDialogContent transition:scale={{ duration: 250, easing: quintOut, start: 0.9 }}>
 			<div class="w-full px-6">
 				<div class="p-6 bg-outer-space-100 shadow-lg rounded-lg flex flex-col">
 					<span class="mb-6 text-center font-medium break-words whitespace-normal">{item.text}</span>
