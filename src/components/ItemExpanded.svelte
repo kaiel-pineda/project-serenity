@@ -38,7 +38,7 @@
 		<div class="fixed left-1/2 top-1/2 z-50 transform -translate-x-1/2 -translate-y-1/2 w-full max-w-screen-lg" {...$itemDialogContent} use:itemDialogContent transition:fade>
 			<div class="w-full px-6">
 				<div class="p-6 bg-outer-space-100 shadow-lg rounded-lg flex flex-col">
-					<span class="mb-6 text-center font-medium">{item.text}</span>
+					<span class="mb-6 text-center font-medium break-words whitespace-normal">{item.text}</span>
 					<textarea class="p-3 border border-outer-space-300 bg-transparent rounded-md placeholder:text-outer-space-900" placeholder="Write additional notes for this item" bind:value={item.note} />
 					<div class="flex items-center justify-end">
 						<button class="mt-6 text-base/normal font-semibold text-outer-space-900" {...$itemDialogClose} use:itemDialogClose on:click={handleSave}> Save </button>

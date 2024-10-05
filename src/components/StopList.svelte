@@ -14,7 +14,7 @@
 	let stopList: StopItem[] = [];
 	let paginatedList: StopItem[] = [];
 	let currentPage = 1;
-	const itemsPerPage = 12;
+	const itemsPerPage = 8;
 	let totalPages = 1;
 
 	onMount(() => {
@@ -38,10 +38,19 @@
 		updatePaginatedList();
 	}
 
+	function rearrangeItemsForColumns(items, columns) {
+		const columnItems = Array.from({ length: columns }, () => []);
+		items.forEach((item, index) => {
+			columnItems[index % columns].push(item);
+		});
+		return columnItems.flat();
+	}
+
 	function updatePaginatedList() {
 		const start = (currentPage - 1) * itemsPerPage;
 		const end = currentPage * itemsPerPage;
-		paginatedList = stopList.slice(start, end);
+		const slicedItems = stopList.slice(start, end);
+		paginatedList = rearrangeItemsForColumns(slicedItems, 2);
 	}
 
 	function updateLocalStorage() {
