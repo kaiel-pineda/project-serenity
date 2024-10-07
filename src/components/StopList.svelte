@@ -12,10 +12,6 @@
 	}
 
 	let stopList: StopItem[] = [];
-	let paginatedList: StopItem[] = [];
-	let currentPage = 1;
-	const itemsPerPage = 8;
-	let totalPages = 1;
 
 	onMount(() => {
 		if (typeof window !== "undefined") {
@@ -25,33 +21,9 @@
 					...item,
 					isEditing: false,
 				}));
-				updatePagination();
 			}
 		}
 	});
-
-	function updatePagination() {
-		totalPages = Math.ceil(stopList.length / itemsPerPage) || 1;
-		if (currentPage > totalPages) {
-			currentPage = totalPages;
-		}
-		updatePaginatedList();
-	}
-
-	function rearrangeItemsForColumns(items, columns) {
-		const columnItems = Array.from({ length: columns }, () => []);
-		items.forEach((item, index) => {
-			columnItems[index % columns].push(item);
-		});
-		return columnItems.flat();
-	}
-
-	function updatePaginatedList() {
-		const start = (currentPage - 1) * itemsPerPage;
-		const end = currentPage * itemsPerPage;
-		const slicedItems = stopList.slice(start, end);
-		paginatedList = rearrangeItemsForColumns(slicedItems, 2);
-	}
 
 	function updateLocalStorage() {
 		if (typeof window !== "undefined") {
@@ -62,13 +34,11 @@
 	function removeFromList(itemId: number) {
 		stopList = stopList.filter((item) => item.id !== itemId);
 		updateLocalStorage();
-		updatePagination();
 	}
 
 	function updateItem(itemId: number, updatedFields: Partial<StopItem>) {
 		stopList = stopList.map((item) => (item.id === itemId ? { ...item, ...updatedFields } : item));
 		updateLocalStorage();
-		updatePaginatedList();
 	}
 
 	function saveNoteForItem(itemId: number, note: string) {
@@ -96,15 +66,6 @@
 	function clearAll() {
 		stopList = [];
 		updateLocalStorage();
-		currentPage = 1;
-		updatePagination();
-	}
-
-	function goToPage(page: number) {
-		if (page >= 1 && page <= totalPages) {
-			currentPage = page;
-			updatePaginatedList();
-		}
 	}
 
 	function getStopLabel(count: number) {
@@ -125,8 +86,6 @@
 
 		stopList = [...stopList, { id: Date.now(), text, status: false, isEditing: false }];
 		updateLocalStorage();
-		updatePagination();
-		goToPage(totalPages);
 	}
 </script>
 
@@ -148,7 +107,7 @@
 		<section>
 			<div class="container mx-auto px-6">
 				<div class="columns-2 gap-x-6">
-					{#each paginatedList as item (item.id)}
+					{#each stopList as item (item.id)}
 						<div class="relative break-inside-avoid mb-6 break-words max-w-full flex flex-col gap-y-3 justify-between rounded-lg {item.status ? 'bg-outer-space-200' : 'bg-outer-space-50'} text-black p-3 w-full">
 							<ItemExpanded class="absolute inset-0 z-10" {item} on:saveNotes={(e) => saveNoteForItem(item.id, e.detail.note)} />
 							{#if item.isEditing}
@@ -205,14 +164,6 @@
 						</div>
 					{/each}
 				</div>
-
-				{#if totalPages > 1}
-					<div class="pagination-controls mt-6 flex items-center justify-center gap-6">
-						<button class="rounded-full bg-outer-space-500 text-outer-space-100 py-3 px-6" disabled={currentPage === 1} on:click={() => goToPage(currentPage - 1)}> Previous </button>
-						<span>{currentPage} of {totalPages}</span>
-						<button class="rounded-full bg-outer-space-500 text-outer-space-100 py-3 px-6" disabled={currentPage === totalPages} on:click={() => goToPage(currentPage + 1)}> Next </button>
-					</div>
-				{/if}
 			</div>
 		</section>
 	</div>

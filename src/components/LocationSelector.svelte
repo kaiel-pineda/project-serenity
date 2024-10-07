@@ -79,7 +79,7 @@
 				</button>
 				{#if $isDropdownOpen}
 					<div class="absolute inset-0 z-50" {...dropdownOverlay} use:dropdownOverlay />
-					<div class="absolute z-50 mt-3 min-w-52 rounded-lg bg-outer-space-100 py-3 shadow-lg" {...dropdownMenu} use:dropdownMenu transition:fly={{ duration: 200, y: -5 }}>
+					<div class="absolute z-50 mt-3 min-w-52 rounded-lg bg-outer-space-100 py-3 shadow-lg" {...dropdownMenu} use:dropdownMenu transition:fly={{ duration: 250, y: -5, easing: cubicInOut }}>
 						{#each locations as location}
 							<button class="block w-full p-3 text-sm text-left font-medium" {...dropdownItem} use:dropdownItem on:click={() => selectLocation(location)}>
 								{location}
@@ -95,16 +95,16 @@
 					</svg>
 				</button>
 				{#if $isDialogOpen}
-					<div class="fixed inset-0 z-50 bg-black/50" {...dialogOverlay} use:dialogOverlay transition:fade={{ duration: 150 }} />
+					<div class="fixed inset-0 z-50 bg-black/50" {...dialogOverlay} use:dialogOverlay transition:fade={{ duration: 150, easing: cubicInOut }} />
 					<div
 						class="fixed inset-x-0 bottom-0 z-50 w-full rounded-t-3xl bg-outer-space-100 p-6"
 						{...dialogContent}
 						use:dialogContent
 						transition:fly={{
 							y: 300,
-							duration: 400,
+							duration: 200,
 							easing: cubicInOut,
-							delay: 100,
+							delay: 75,
 						}}
 					>
 						<div class="flex flex-col gap-y-3">
