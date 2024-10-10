@@ -2,6 +2,7 @@
 	import { onMount } from "svelte";
 	import ItemExpanded from "./ItemExpanded.svelte";
 	import ItemInput from "./ItemInput.svelte";
+	import { isPickups } from "../stores/pickupsStore";
 
 	interface StopItem {
 		id: number;
@@ -36,7 +37,7 @@
 	}
 
 	function updateDisplayList() {
-		rearrangedList = rearrangeItemsForColumns(stopList, 2); // Rearranging into two columns
+		rearrangedList = rearrangeItemsForColumns(stopList, 2);
 	}
 
 	function updateLocalStorage() {
@@ -87,10 +88,16 @@
 		updateDisplayList();
 	}
 
-	function getStopLabel(count: number) {
-		if (count === 0) return "No Stops";
-		if (count === 1) return "1 Stop";
-		return `${count} Stops`;
+	function getStopLabel(count: number, isPickups: boolean) {
+		if (isPickups) {
+			if (count === 0) return "No Pick-ups";
+			if (count === 1) return "1 Pick-up";
+			return `${count} Pick-ups`;
+		} else {
+			if (count === 0) return "No Deliveries";
+			if (count === 1) return "1 Delivery";
+			return `${count} Deliveries`;
+		}
 	}
 
 	export function focusInput(node: HTMLInputElement) {
@@ -118,7 +125,7 @@
 			<div class="container mx-auto px-6">
 				<div class="flex items-center justify-between gap-x-3">
 					<span class="text-lg font-medium">
-						{getStopLabel(stopList.length)}
+						{getStopLabel(stopList.length, $isPickups)}
 					</span>
 					<div class="justify-end">
 						<button
