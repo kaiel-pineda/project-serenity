@@ -21,9 +21,23 @@
 					...item,
 					isEditing: false,
 				}));
+				updateColumnOrder();
 			}
 		}
 	});
+
+	function rearrangeItemsForColumns(items, columns) {
+		const columnItems = Array.from({ length: columns }, () => []);
+		items.forEach((item, index) => {
+			columnItems[index % columns].push(item);
+		});
+		return columnItems.flat();
+	}
+
+	function updateColumnOrder() {
+		stopList = rearrangeItemsForColumns(stopList, 2);  // Rearranging into two columns
+		updateLocalStorage();
+	}
 
 	function updateLocalStorage() {
 		if (typeof window !== "undefined") {
@@ -33,12 +47,12 @@
 
 	function removeFromList(itemId: number) {
 		stopList = stopList.filter((item) => item.id !== itemId);
-		updateLocalStorage();
+		updateColumnOrder();
 	}
 
 	function updateItem(itemId: number, updatedFields: Partial<StopItem>) {
 		stopList = stopList.map((item) => (item.id === itemId ? { ...item, ...updatedFields } : item));
-		updateLocalStorage();
+		updateColumnOrder();
 	}
 
 	function saveNoteForItem(itemId: number, note: string) {
@@ -85,7 +99,7 @@
 		const { text } = event.detail;
 
 		stopList = [...stopList, { id: Date.now(), text, status: false, isEditing: false }];
-		updateLocalStorage();
+		updateColumnOrder();
 	}
 </script>
 
