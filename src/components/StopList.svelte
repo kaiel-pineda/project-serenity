@@ -12,6 +12,7 @@
 	}
 
 	let stopList: StopItem[] = [];
+	let rearrangedList: StopItem[] = [];
 
 	onMount(() => {
 		if (typeof window !== "undefined") {
@@ -21,12 +22,12 @@
 					...item,
 					isEditing: false,
 				}));
-				updateColumnOrder();
 			}
+			updateDisplayList();
 		}
 	});
 
-	function rearrangeItemsForColumns(items, columns) {
+	function rearrangeItemsForColumns(items: StopItem[], columns: number): StopItem[] {
 		const columnItems = Array.from({ length: columns }, () => []);
 		items.forEach((item, index) => {
 			columnItems[index % columns].push(item);
@@ -34,9 +35,8 @@
 		return columnItems.flat();
 	}
 
-	function updateColumnOrder() {
-		stopList = rearrangeItemsForColumns(stopList, 2);  // Rearranging into two columns
-		updateLocalStorage();
+	function updateDisplayList() {
+		rearrangedList = rearrangeItemsForColumns(stopList, 2); // Rearranging into two columns
 	}
 
 	function updateLocalStorage() {
@@ -47,12 +47,16 @@
 
 	function removeFromList(itemId: number) {
 		stopList = stopList.filter((item) => item.id !== itemId);
-		updateColumnOrder();
+		updateLocalStorage();
+		updateDisplayList();
 	}
 
 	function updateItem(itemId: number, updatedFields: Partial<StopItem>) {
-		stopList = stopList.map((item) => (item.id === itemId ? { ...item, ...updatedFields } : item));
-		updateColumnOrder();
+		stopList = stopList.map((item) =>
+			item.id === itemId ? { ...item, ...updatedFields } : item
+		);
+		updateLocalStorage();
+		updateDisplayList();
 	}
 
 	function saveNoteForItem(itemId: number, note: string) {
@@ -80,6 +84,7 @@
 	function clearAll() {
 		stopList = [];
 		updateLocalStorage();
+		updateDisplayList();
 	}
 
 	function getStopLabel(count: number) {
@@ -98,8 +103,12 @@
 	function handleAddItem(event) {
 		const { text } = event.detail;
 
-		stopList = [...stopList, { id: Date.now(), text, status: false, isEditing: false }];
-		updateColumnOrder();
+		stopList = [
+			...stopList,
+			{ id: Date.now(), text, status: false, isEditing: false },
+		];
+		updateLocalStorage();
+		updateDisplayList();
 	}
 </script>
 
@@ -112,7 +121,12 @@
 						{getStopLabel(stopList.length)}
 					</span>
 					<div class="justify-end">
-						<button class="rounded-full bg-old-gold-500 py-3 px-4 font-medium text-white text-base/normal" on:click={clearAll}> Clear All </button>
+						<button
+							class="rounded-full bg-old-gold-500 py-3 px-4 font-medium text-white text-base/normal"
+							on:click={clearAll}
+						>
+							Clear All
+						</button>
 					</div>
 				</div>
 			</div>
@@ -121,9 +135,17 @@
 		<section>
 			<div class="container mx-auto px-6">
 				<div class="columns-2 gap-x-6">
-					{#each stopList as item (item.id)}
-						<div class="relative break-inside-avoid mb-6 break-words max-w-full flex flex-col gap-y-3 justify-between rounded-lg {item.status ? 'bg-outer-space-200' : 'bg-outer-space-50'} text-black p-3 w-full">
-							<ItemExpanded class="absolute inset-0 z-10" {item} on:saveNotes={(e) => saveNoteForItem(item.id, e.detail.note)} />
+					{#each rearrangedList as item (item.id)}
+						<div
+							class="relative break-inside-avoid mb-6 break-words max-w-full flex flex-col gap-y-3 justify-between rounded-lg {item.status ? 'bg-outer-space-200' : 'bg-outer-space-50'} text-black p-3 w-full"
+						>
+							<ItemExpanded
+								class="absolute inset-0 z-10"
+								{item}
+								on:saveNotes={(e) =>
+									saveNoteForItem(item.id, e.detail.note)
+								}
+							/>
 							{#if item.isEditing}
 								<input
 									id={"input-" + item.id}
@@ -132,7 +154,8 @@
 									bind:value={item.text}
 									on:blur={() => editItem(item.id, item.text)}
 									on:keydown={(e) => {
-										if (e.key === "Enter") editItem(item.id, item.text);
+										if (e.key === "Enter")
+											editItem(item.id, item.text);
 									}}
 									use:focusInput
 								/>
@@ -143,7 +166,10 @@
 									role="button"
 									tabindex="0"
 									on:keydown={(e) => {
-										if (e.key === "Enter" || e.key === " ") {
+										if (
+											e.key === "Enter" ||
+											e.key === " "
+										) {
 											e.preventDefault();
 											toggleEdit(item.id);
 										}
@@ -153,25 +179,70 @@
 								</span>
 							{/if}
 							<div class="flex items-center justify-between gap-x-3 w-full">
-								<button type="button" on:click={() => toggleStatus(item.id)} class="z-20 size-6 flex items-center justify-center rounded-full border transition-all duration-200 {item.status ? 'bg-blue-500 border-blue-500' : 'border-outer-space-500 bg-transparent'}" aria-pressed={item.status}>
+								<button
+									type="button"
+									on:click={() => toggleStatus(item.id)}
+									class="z-20 size-6 flex items-center justify-center rounded-full border transition-all duration-200 {item.status ? 'bg-blue-500 border-blue-500' : 'border-outer-space-500 bg-transparent'}"
+									aria-pressed={item.status}
+								>
 									{#if item.status}
-										<svg xmlns="http://www.w3.org/2000/svg" class="size-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
-											<path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+										<svg
+											xmlns="http://www.w3.org/2000/svg"
+											class="size-4 text-white"
+											fill="none"
+											viewBox="0 0 24 24"
+											stroke="currentColor"
+											stroke-width="3"
+										>
+											<path
+												stroke-linecap="round"
+												stroke-linejoin="round"
+												d="M5 13l4 4L19 7"
+											/>
 										</svg>
 									{/if}
 								</button>
 								{#if item.note && item.note.trim() !== ""}
 									<div>
-										<svg xmlns="http://www.w3.org/2000/svg" class="size-4 fill-old-gold-700" viewBox="0 0 16 16">
-											<path d="M2.5 1A1.5 1.5 0 0 0 1 2.5v11A1.5 1.5 0 0 0 2.5 15h6.086a1.5 1.5 0 0 0 1.06-.44l4.915-4.914A1.5 1.5 0 0 0 15 8.586V2.5A1.5 1.5 0 0 0 13.5 1zM2 2.5a.5.5 0 0 1 .5-.5h11a.5.5 0 0 1 .5.5V8H9.5A1.5 1.5 0 0 0 8 9.5V14H2.5a.5.5 0 0 1-.5-.5zm7 11.293V9.5a.5.5 0 0 1 .5-.5h4.293z" />
+										<svg
+											xmlns="http://www.w3.org/2000/svg"
+											class="size-4 fill-old-gold-700"
+											viewBox="0 0 16 16"
+										>
+											<path
+												d="M2.5 1A1.5 1.5 0 0 0 1 2.5v11A1.5 1.5 0 0 0 2.5 15h6.086a1.5 1.5 0 0 0 1.06-.44l4.915-4.914A1.5 1.5 0 0 0 15 8.586V2.5A1.5 1.5 0 0 0 13.5 1zM2 2.5a.5.5 0 0 1 .5-.5h11a.5.5 0 0 1 .5.5V8H9.5A1.5 1.5 0 0 0 8 9.5V14H2.5a.5.5 0 0 1-.5-.5zm7 11.293V9.5a.5.5 0 0 1 .5-.5h4.293z"
+											/>
 										</svg>
 									</div>
 								{/if}
-								<button class="z-20" on:click={() => removeFromList(item.id)}>
-									<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="size-6 stroke-outer-space-500">
-										<path d="M21 4H8l-7 8 7 8h13a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2z" />
-										<line x1="18" y1="9" x2="12" y2="15" />
-										<line x1="12" y1="9" x2="18" y2="15" />
+								<button
+									class="z-20"
+									on:click={() => removeFromList(item.id)}
+								>
+									<svg
+										xmlns="http://www.w3.org/2000/svg"
+										viewBox="0 0 24 24"
+										fill="none"
+										stroke-width="1"
+										stroke-linecap="round"
+										stroke-linejoin="round"
+										class="size-6 stroke-outer-space-500"
+									>
+										<path
+											d="M21 4H8l-7 8 7 8h13a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2z"
+										/>
+										<line
+											x1="18"
+											y1="9"
+											x2="12"
+											y2="15"
+										/>
+										<line
+											x1="12"
+											y1="9"
+											x2="18"
+											y2="15"
+										/>
 									</svg>
 								</button>
 							</div>
