@@ -40,16 +40,26 @@
 	}
 
 	function togglePickups() {
-		isPickups.update(value => !value);
+		isPickups.update(value => {
+			const newValue = !value;
+			localStorage.setItem("isPickups", JSON.stringify(newValue));
+			return newValue;
+		});
 	}
 
 	onMount(() => {
 		detectMobile();
 		if (typeof window !== "undefined") {
 			window.addEventListener("resize", detectMobile);
+
 			const savedLocation = localStorage.getItem("savedLocation");
 			if (savedLocation && locations.includes(savedLocation)) {
 				selectedLocation = savedLocation;
+			}
+
+			const savedPickups = localStorage.getItem("isPickups");
+			if (savedPickups !== null) {
+				isPickups.set(JSON.parse(savedPickups));
 			}
 		}
 		mounted = true;
