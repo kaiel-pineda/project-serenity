@@ -15,8 +15,9 @@
 	let pickupList: Array<StopItem> = [];
 	let deliveryList: Array<StopItem> = [];
 
-	let rearrangedPickupList: StopItem[] = [];
-	let rearrangedDeliveryList: StopItem[] = [];
+	// Updated to hold left and right columns
+	let rearrangedPickupList: { left: StopItem[]; right: StopItem[] } = { left: [], right: [] };
+	let rearrangedDeliveryList: { left: StopItem[]; right: StopItem[] } = { left: [], right: [] };
 
 	$: currentList = $isPickups ? pickupList : deliveryList;
 	$: rearrangedCurrentList = $isPickups ? rearrangedPickupList : rearrangedDeliveryList;
@@ -43,17 +44,25 @@
 		}
 	});
 
-	function rearrangeItemsForColumns(items: StopItem[], columns: number): StopItem[] {
-		const columnItems: StopItem[][] = Array.from({ length: columns }, () => []);
+	// Updated function to alternate items between left and right columns
+	function rearrangeItemsForColumns(items: StopItem[]): { left: StopItem[]; right: StopItem[] } {
+		const leftColumn: StopItem[] = [];
+		const rightColumn: StopItem[] = [];
+
 		items.forEach((item, index) => {
-			columnItems[index % columns].push(item);
+			if (index % 2 === 0) {
+				leftColumn.push(item);
+			} else {
+				rightColumn.push(item);
+			}
 		});
-		return columnItems.flat();
+
+		return { left: leftColumn, right: rightColumn };
 	}
 
 	function updateDisplayLists() {
-		rearrangedPickupList = rearrangeItemsForColumns(pickupList, 2);
-		rearrangedDeliveryList = rearrangeItemsForColumns(deliveryList, 2);
+		rearrangedPickupList = rearrangeItemsForColumns(pickupList);
+		rearrangedDeliveryList = rearrangeItemsForColumns(deliveryList);
 	}
 
 	function updateLocalStorage() {
@@ -170,63 +179,124 @@
 
 		<section>
 			<div class="container mx-auto px-6">
-				<div class="columns-2 gap-x-6">
-					{#each rearrangedCurrentList as item (item.id)}
-						<div class="relative break-inside-avoid mb-6 break-words max-w-full flex flex-col gap-y-3 justify-between rounded-lg {item.status ? 'bg-outer-space-200' : 'bg-outer-space-50'} text-black p-3 w-full">
-							<ItemExpanded class="absolute inset-0 z-10" {item} on:saveNotes={(e) => saveNoteForItem(item.id, e.detail.note)} />
-							{#if item.isEditing}
-								<input
-									id={"input-" + item.id}
-									class="p-3 text-center text-lg/normal font-medium bg-transparent w-full z-20"
-									type="text"
-									bind:value={item.text}
-									on:blur={() => editItem(item.id, item.text)}
-									on:keydown={(e) => {
-										if (e.key === "Enter") editItem(item.id, item.text);
-									}}
-									use:focusInput
-								/>
-							{:else}
-								<span
-									class="p-3 text-center text-lg/normal font-medium z-20 {item.status ? 'line-through' : ''}"
-									on:click={() => toggleEdit(item.id)}
-									role="button"
-									tabindex="0"
-									on:keydown={(e) => {
-										if (e.key === "Enter" || e.key === " ") {
-											e.preventDefault();
-											toggleEdit(item.id);
-										}
-									}}
-								>
-									{item.text}
-								</span>
-							{/if}
-							<div class="flex items-center justify-between gap-x-3 w-full">
-								<button type="button" on:click={() => toggleStatus(item.id)} class="z-20 size-6 flex items-center justify-center rounded-full border transition-all duration-200 {item.status ? 'bg-blue-500 border-blue-500' : 'border-outer-space-500 bg-transparent'}" aria-pressed={item.status}>
-									{#if item.status}
-										<svg xmlns="http://www.w3.org/2000/svg" class="size-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
-											<path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
-										</svg>
-									{/if}
-								</button>
-								{#if item.note && item.note.trim() !== ""}
-									<div>
-										<svg xmlns="http://www.w3.org/2000/svg" class="size-4 fill-old-gold-700" viewBox="0 0 16 16">
-											<path d="M2.5 1A1.5 1.5 0 0 0 1 2.5v11A1.5 1.5 0 0 0 2.5 15h6.086a1.5 1.5 0 0 0 1.06-.44l4.915-4.914A1.5 1.5 0 0 0 15 8.586V2.5A1.5 1.5 0 0 0 13.5 1zM2 2.5a.5.5 0 0 1 .5-.5h11a.5.5 0 0 1 .5.5V8H9.5A1.5 1.5 0 0 0 8 9.5V14H2.5a.5.5 0 0 1-.5-.5zm7 11.293V9.5a.5.5 0 0 1 .5-.5h4.293z" />
-										</svg>
-									</div>
+				<div class="grid grid-cols-2 justify-between gap-x-6">
+					<div class="flex flex-col gap-y-6">
+						{#each rearrangedCurrentList.left as item (item.id)}
+							<div class="relative break-inside-avoid break-words max-w-full flex flex-col gap-y-3 justify-between rounded-lg {item.status ? 'bg-outer-space-200' : 'bg-outer-space-50'} text-black p-3 w-full">
+								<ItemExpanded class="absolute inset-0 z-10" {item} on:saveNotes={(e) => saveNoteForItem(item.id, e.detail.note)} />
+								{#if item.isEditing}
+									<input
+										id={"input-" + item.id}
+										class="p-3 text-center text-lg/normal font-medium bg-transparent w-full z-20"
+										type="text"
+										bind:value={item.text}
+										on:blur={() => editItem(item.id, item.text)}
+										on:keydown={(e) => {
+											if (e.key === "Enter") editItem(item.id, item.text);
+										}}
+										use:focusInput
+									/>
+								{:else}
+									<span
+										class="p-3 text-center text-lg/normal font-medium z-20 {item.status ? 'line-through' : ''}"
+										on:click={() => toggleEdit(item.id)}
+										role="button"
+										tabindex="0"
+										on:keydown={(e) => {
+											if (e.key === "Enter" || e.key === " ") {
+												e.preventDefault();
+												toggleEdit(item.id);
+											}
+										}}
+									>
+										{item.text}
+									</span>
 								{/if}
-								<button class="z-20" on:click={() => removeFromList(item.id)}>
-									<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="size-6 stroke-outer-space-500">
-										<path d="M21 4H8l-7 8 7 8h13a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2z" />
-										<line x1="18" y1="9" x2="12" y2="15" />
-										<line x1="12" y1="9" x2="18" y2="15" />
-									</svg>
-								</button>
+								<div class="flex items-center justify-between gap-x-3 w-full">
+									<button type="button" on:click={() => toggleStatus(item.id)} class="z-20 size-6 flex items-center justify-center rounded-full border transition-all duration-200 {item.status ? 'bg-blue-500 border-blue-500' : 'border-outer-space-500 bg-transparent'}" aria-pressed={item.status}>
+										{#if item.status}
+											<svg xmlns="http://www.w3.org/2000/svg" class="size-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
+												<path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+											</svg>
+										{/if}
+									</button>
+									{#if item.note && item.note.trim() !== ""}
+										<div>
+											<svg xmlns="http://www.w3.org/2000/svg" class="size-4 fill-old-gold-700" viewBox="0 0 16 16">
+												<path d="M2.5 1A1.5 1.5 0 0 0 1 2.5v11A1.5 1.5 0 0 0 2.5 15h6.086a1.5 1.5 0 0 0 1.06-.44l4.915-4.914A1.5 1.5 0 0 0 15 8.586V2.5A1.5 1.5 0 0 0 13.5 1zM2 2.5a.5.5 0 0 1 .5-.5h11a.5.5 0 0 1 .5.5V8H9.5A1.5 1.5 0 0 0 8 9.5V14H2.5a.5.5 0 0 1-.5-.5zm7 11.293V9.5a.5.5 0 0 1 .5-.5h4.293z" />
+											</svg>
+										</div>
+									{/if}
+									<button class="z-20" on:click={() => removeFromList(item.id)}>
+										<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="size-6 stroke-outer-space-500">
+											<path d="M21 4H8l-7 8 7 8h13a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2z" />
+											<line x1="18" y1="9" x2="12" y2="15" />
+											<line x1="12" y1="9" x2="18" y2="15" />
+										</svg>
+									</button>
+								</div>
 							</div>
-						</div>
-					{/each}
+						{/each}
+					</div>
+
+					<div class="flex flex-col gap-y-6">
+						{#each rearrangedCurrentList.right as item (item.id)}
+							<div class="relative break-inside-avoid break-words max-w-full flex flex-col gap-y-3 justify-between rounded-lg {item.status ? 'bg-outer-space-200' : 'bg-outer-space-50'} text-black p-3 w-full">
+								<ItemExpanded class="absolute inset-0 z-10" {item} on:saveNotes={(e) => saveNoteForItem(item.id, e.detail.note)} />
+								{#if item.isEditing}
+									<input
+										id={"input-" + item.id}
+										class="p-3 text-center text-lg/normal font-medium bg-transparent w-full z-20"
+										type="text"
+										bind:value={item.text}
+										on:blur={() => editItem(item.id, item.text)}
+										on:keydown={(e) => {
+											if (e.key === "Enter") editItem(item.id, item.text);
+										}}
+										use:focusInput
+									/>
+								{:else}
+									<span
+										class="p-3 text-center text-lg/normal font-medium z-20 {item.status ? 'line-through' : ''}"
+										on:click={() => toggleEdit(item.id)}
+										role="button"
+										tabindex="0"
+										on:keydown={(e) => {
+											if (e.key === "Enter" || e.key === " ") {
+												e.preventDefault();
+												toggleEdit(item.id);
+											}
+										}}
+									>
+										{item.text}
+									</span>
+								{/if}
+								<div class="flex items-center justify-between gap-x-3 w-full">
+									<button type="button" on:click={() => toggleStatus(item.id)} class="z-20 size-6 flex items-center justify-center rounded-full border transition-all duration-200 {item.status ? 'bg-blue-500 border-blue-500' : 'border-outer-space-500 bg-transparent'}" aria-pressed={item.status}>
+										{#if item.status}
+											<svg xmlns="http://www.w3.org/2000/svg" class="size-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
+												<path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+											</svg>
+										{/if}
+									</button>
+									{#if item.note && item.note.trim() !== ""}
+										<div>
+											<svg xmlns="http://www.w3.org/2000/svg" class="size-4 fill-old-gold-700" viewBox="0 0 16 16">
+												<path d="M2.5 1A1.5 1.5 0 0 0 1 2.5v11A1.5 1.5 0 0 0 2.5 15h6.086a1.5 1.5 0 0 0 1.06-.44l4.915-4.914A1.5 1.5 0 0 0 15 8.586V2.5A1.5 1.5 0 0 0 13.5 1zM2 2.5a.5.5 0 0 1 .5-.5h11a.5.5 0 0 1 .5.5V8H9.5A1.5 1.5 0 0 0 8 9.5V14H2.5a.5.5 0 0 1-.5-.5zm7 11.293V9.5a.5.5 0 0 1 .5-.5h4.293z" />
+											</svg>
+										</div>
+									{/if}
+									<button class="z-20" on:click={() => removeFromList(item.id)}>
+										<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="size-6 stroke-outer-space-500">
+											<path d="M21 4H8l-7 8 7 8h13a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2z" />
+											<line x1="18" y1="9" x2="12" y2="15" />
+											<line x1="12" y1="9" x2="18" y2="15" />
+										</svg>
+									</button>
+								</div>
+							</div>
+						{/each}
+					</div>
 				</div>
 			</div>
 		</section>
