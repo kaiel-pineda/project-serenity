@@ -39,6 +39,14 @@
 		}
 	}
 
+	$: if ($isDropdownOpen) {
+		isDialogOpen.set(false);
+	}
+
+	$: if ($isDialogOpen) {
+		isDropdownOpen.set(false);
+	}
+
 	function togglePickups() {
 		isPickups.update((value) => {
 			const newValue = !value;
@@ -88,7 +96,7 @@
 
 			{#if !isMobile}
 				<button {...dropdownTrigger} use:dropdownTrigger class="flex items-center justify-between gap-x-1">
-					<span class="text-xl/normal font-semibold">{selectedLocation}</span>
+					<span class="text-xl/normal font-semibold text-fuscous-gray-900">{selectedLocation}</span>
 					<svg xmlns="http://www.w3.org/2000/svg" class="size-6" fill="currentColor" viewBox="0 -960 960 960">
 						<path xmlns="http://www.w3.org/2000/svg" d="M480-360 280-560h400L480-360Z" />
 					</svg>
@@ -105,8 +113,8 @@
 				{/if}
 			{:else}
 				<button {...dialogTrigger} use:dialogTrigger class="flex items-center justify-between gap-x-1">
-					<span class="text-xl/normal font-semibold">{selectedLocation}</span>
-					<svg xmlns="http://www.w3.org/2000/svg" class="size-6" fill="currentColor" viewBox="0 -960 960 960">
+					<span class="text-xl/normal font-semibold text-fuscous-gray-900">{selectedLocation}</span>
+					<svg xmlns="http://www.w3.org/2000/svg" class="size-6 fill-fuscous-gray-900" viewBox="0 -960 960 960">
 						<path xmlns="http://www.w3.org/2000/svg" d="M480-360 280-560h400L480-360Z" />
 					</svg>
 				</button>

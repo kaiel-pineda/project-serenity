@@ -66,7 +66,7 @@
 					<span class="mb-6 text-center font-medium break-words whitespace-normal">{item.text}</span>
 					<textarea class="p-3 border border-outer-space-300 bg-transparent rounded-md placeholder:text-outer-space-800 text-outer-space-800" placeholder="Write additional notes for this item." bind:value={item.note} use:autoResizeTextarea />
 					<div class="flex items-center justify-end">
-						<button class="mt-6 text-base/normal font-semibold text-outer-space-900" {...$itemDialogClose} use:itemDialogClose on:click={handleSave}> Save </button>
+						<button class="mt-6 text-base/normal font-semibold text-outer-space-900" {...$itemDialogClose} use:itemDialogClose on:click|stopPropagation={handleSave}>Save</button>
 					</div>
 				</div>
 			</div>
