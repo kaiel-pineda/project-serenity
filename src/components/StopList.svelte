@@ -15,7 +15,6 @@
 	let pickupList: Array<StopItem> = [];
 	let deliveryList: Array<StopItem> = [];
 
-	// Updated to hold left and right columns
 	let rearrangedPickupList: { left: StopItem[]; right: StopItem[] } = { left: [], right: [] };
 	let rearrangedDeliveryList: { left: StopItem[]; right: StopItem[] } = { left: [], right: [] };
 
@@ -44,7 +43,6 @@
 		}
 	});
 
-	// Updated function to alternate items between left and right columns
 	function rearrangeItemsForColumns(items: StopItem[]): { left: StopItem[]; right: StopItem[] } {
 		const leftColumn: StopItem[] = [];
 		const rightColumn: StopItem[] = [];
@@ -167,12 +165,14 @@
 		<header>
 			<div class="container mx-auto px-6">
 				<div class="flex items-center justify-between gap-x-3">
-					<span class="text-lg font-medium">
+					<span class="text-lg font-medium py-3">
 						{getStopLabel(currentList.length, $isPickups)}
 					</span>
-					<div class="justify-end">
-						<button class="rounded-full bg-old-gold-500 py-3 px-4 font-medium text-white text-base/normal" on:click={clearAll}>Clear List</button>
-					</div>
+					{#if currentList.length > 0}
+						<div class="justify-end">
+							<button class="rounded-full bg-old-gold-500 py-3 px-4 font-semibold text-white text-base/normal" on:click={clearAll}>Clear List</button>
+						</div>
+					{/if}
 				</div>
 			</div>
 		</header>

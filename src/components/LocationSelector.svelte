@@ -97,7 +97,7 @@
 					<div class="absolute inset-0 z-50" {...dropdownOverlay} use:dropdownOverlay />
 					<div class="absolute z-50 mt-3 min-w-52 rounded-lg bg-outer-space-100 py-3 shadow-lg" {...dropdownMenu} use:dropdownMenu transition:fly={{ duration: 250, y: -5, easing: cubicInOut }}>
 						{#each locations as location}
-							<button class="block w-full p-3 text-sm text-left font-medium" {...dropdownItem} use:dropdownItem on:click={() => selectLocation(location)}>
+							<button class="block w-full p-3 text-sm/normal text-left font-medium text-outer-space-900" {...dropdownItem} use:dropdownItem on:click={() => selectLocation(location)}>
 								{location}
 							</button>
 						{/each}
@@ -124,10 +124,9 @@
 						}}
 					>
 						<div class="flex flex-col gap-y-3">
-							<h3 class="my-3 text-left text-base font-semibold">Select Location</h3>
 							<div class="flex flex-col">
 								{#each locations as location}
-									<button class="block w-full py-3 text-lg text-left font-medium" on:click={() => selectLocation(location)}>
+									<button class="block w-full py-3 text-lg/normal text-left font-medium text-outer-space-900" on:click={() => selectLocation(location)}>
 										{location}
 									</button>
 								{/each}
