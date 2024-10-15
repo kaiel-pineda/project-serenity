@@ -19,7 +19,7 @@
 	}
 </script>
 
-<footer class={`sticky bottom-0 z-30 transition-colors duration-100 ease-in-out ${showInput ? "bg-white" : "bg-transparent"}`}>
+<footer class={`sticky bottom-0 z-30 transition-colors duration-200 ease-in-out ${showInput ? "bg-white" : "bg-transparent"}`}>
 	<div class="container mx-auto px-6">
 		<div class="flex flex-col justify-center mb-6">
 			<div class="flex justify-between items-center w-full gap-x-6">

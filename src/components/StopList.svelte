@@ -2,6 +2,7 @@
 	import { onMount } from "svelte";
 	import ItemExpanded from "./ItemExpanded.svelte";
 	import ItemInput from "./ItemInput.svelte";
+	import { addToast } from "./ToastNotification.svelte";
 	import { isPickups } from "../stores/pickupsStore";
 
 	interface StopItem {
@@ -10,6 +11,7 @@
 		status: boolean;
 		isEditing: boolean;
 		note?: string;
+		originalText?: string;
 	}
 
 	let pickupList: Array<StopItem> = [];
@@ -104,12 +106,31 @@
 	function toggleEdit(itemId: number) {
 		const item = currentList.find((item) => item.id === itemId);
 		if (item) {
-			updateItem(itemId, { isEditing: !item.isEditing });
+			updateItem(itemId, { isEditing: !item.isEditing, originalText: item.text });
 		}
 	}
 
 	function editItem(itemId: number, newText: string) {
-		updateItem(itemId, { text: newText, isEditing: false });
+		const trimmedText = newText.trim();
+		const item = currentList.find((item) => item.id === itemId);
+
+		if (!item) return;
+
+		const isDuplicate = currentList.some((otherItem) => otherItem.text.toLowerCase() === trimmedText.toLowerCase() && otherItem.id !== itemId);
+
+		if (isDuplicate) {
+			addToast({
+				data: {
+					title: "Warning",
+					description: `Stop called "${trimmedText}" already exists.`,
+				},
+			});
+
+			updateItem(itemId, { text: item.originalText });
+			return;
+		}
+
+		updateItem(itemId, { text: trimmedText, isEditing: false });
 	}
 
 	function clearAll() {
@@ -143,6 +164,19 @@
 
 	function handleAddItem(event: CustomEvent<{ text: string }>) {
 		const { text } = event.detail;
+
+		const isDuplicate = currentList.some((item) => item.text.toLowerCase() === text.toLowerCase());
+
+		if (isDuplicate) {
+			addToast({
+				data: {
+					title: "Warning",
+					description: `Stop called "${text}" already exists.`,
+				},
+			});
+			return;
+		}
+
 		const newItem = {
 			id: Date.now(),
 			text,
