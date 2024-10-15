@@ -64,7 +64,7 @@
 			<div class="w-full px-6">
 				<div class="p-6 bg-outer-space-100 shadow-lg rounded-lg flex flex-col">
 					<span class="mb-6 text-center font-medium break-words whitespace-normal">{item.text}</span>
-					<textarea class="p-3 border border-outer-space-300 bg-transparent rounded-md placeholder:text-outer-space-800 text-outer-space-800" placeholder="Write additional notes for this item." bind:value={item.note} use:autoResizeTextarea />
+					<textarea class="p-3 border border-outer-space-300 bg-transparent rounded-md placeholder:text-outer-space-600 text-outer-space-800" placeholder="Write additional notes for this item." bind:value={item.note} use:autoResizeTextarea />
 					<div class="flex items-center justify-end">
 						<button class="mt-6 text-base/normal font-semibold text-outer-space-900" {...$itemDialogClose} use:itemDialogClose on:click|stopPropagation={handleSave}>Save</button>
 					</div>
