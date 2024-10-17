@@ -2,6 +2,7 @@
 	export type ToastData = {
 		title: string;
 		description: string;
+		background: string;
 	};
 
 	const {
@@ -21,7 +22,7 @@
 
 <div class="fixed right-0 top-0 z-50 m-4 flex flex-col items-end gap-2 md:bottom-0 md:top-auto" use:portal>
 	{#each $toasts as { id, data } (id)}
-		<div class="rounded-lg bg-copper-500 text-white" {...$content(id)} use:content animate:flip={{ duration: 500 }} in:fly={{ duration: 150, x: "100%" }} out:fly={{ duration: 150, x: "100%" }}>
+		<div class={`p-4 rounded-lg shadow-md text-white ${data.background}`} {...$content(id)} use:content animate:flip={{ duration: 500 }} in:fly={{ duration: 150, x: "100%" }} out:fly={{ duration: 150, x: "100%" }}>
 			<div class="relative flex w-[24rem] max-w-[calc(100vw-2rem)] items-center justify-between gap-3 p-6">
 				<div class="flex flex-col gap-y-1 justify-center">
 					<span class="text-base/normal font-semibold" {...$title(id)} use:title>

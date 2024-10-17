@@ -2,6 +2,7 @@
 	import { onMount } from "svelte";
 	import ItemExpanded from "./ItemExpanded.svelte";
 	import ItemInput from "./ItemInput.svelte";
+	import DeletionConfirmation from "./DeletionConfirmation.svelte";
 	import { addToast } from "./ToastNotification.svelte";
 	import { isPickups } from "../stores/pickupsStore";
 
@@ -73,11 +74,24 @@
 	}
 
 	function removeFromList(itemId: number) {
+		const item = currentList.find((item) => item.id === itemId);
+
+		if (!item) return;
+
 		if ($isPickups) {
 			pickupList = pickupList.filter((item) => item.id !== itemId);
 		} else {
 			deliveryList = deliveryList.filter((item) => item.id !== itemId);
 		}
+
+		addToast({
+			data: {
+				title: "Stop Removed",
+				description: `"${item.text}" has been successfully removed.`,
+				background: "bg-puerto-rico-500",
+			},
+		});
+
 		updateLocalStorage();
 		updateDisplayLists();
 	}
@@ -121,8 +135,9 @@
 		if (isDuplicate) {
 			addToast({
 				data: {
-					title: "Warning",
-					description: `Stop called "${trimmedText}" already exists.`,
+					title: "Input Warning",
+					description: `"${trimmedText}" already exists.`,
+					background: "bg-brandy-punch-500",
 				},
 			});
 
@@ -170,8 +185,9 @@
 		if (isDuplicate) {
 			addToast({
 				data: {
-					title: "Warning",
-					description: `Stop called "${text}" already exists.`,
+					title: "Input Warning",
+					description: `"${text}" already exists.`,
+					background: "bg-brandy-punch-500",
 				},
 			});
 			return;
@@ -261,13 +277,7 @@
 											</svg>
 										</div>
 									{/if}
-									<button class="z-20" on:click={() => removeFromList(item.id)}>
-										<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="size-6 stroke-outer-space-500">
-											<path d="M21 4H8l-7 8 7 8h13a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2z" />
-											<line x1="18" y1="9" x2="12" y2="15" />
-											<line x1="12" y1="9" x2="18" y2="15" />
-										</svg>
-									</button>
+									<DeletionConfirmation {item} on:confirmDelete={(e) => removeFromList(e.detail.id)} />
 								</div>
 							</div>
 						{/each}
@@ -320,13 +330,7 @@
 											</svg>
 										</div>
 									{/if}
-									<button class="z-20" on:click={() => removeFromList(item.id)}>
-										<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="size-6 stroke-outer-space-500">
-											<path d="M21 4H8l-7 8 7 8h13a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2z" />
-											<line x1="18" y1="9" x2="12" y2="15" />
-											<line x1="12" y1="9" x2="18" y2="15" />
-										</svg>
-									</button>
+									<DeletionConfirmation {item} on:confirmDelete={(e) => removeFromList(e.detail.id)} />
 								</div>
 							</div>
 						{/each}

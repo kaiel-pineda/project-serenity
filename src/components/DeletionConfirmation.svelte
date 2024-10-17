@@ -7,14 +7,9 @@
 	interface StopItem {
 		id: number;
 		text: string;
-		status: boolean;
-		isEditing: boolean;
-		note?: string;
 	}
 
 	export let item: StopItem;
-	export let className = "";
-	export { className as class };
 
 	const dispatch = createEventDispatcher();
 
@@ -25,36 +20,18 @@
 		forceVisible: true,
 	});
 
-	function handleSave() {
-		dispatch("saveNotes", { note: item.note });
-	}
-
-	function autoResizeTextarea(node: HTMLTextAreaElement) {
-		const maxHeight = 200;
-
-		function resize() {
-			node.style.height = "auto";
-			const newHeight = Math.min(node.scrollHeight, maxHeight);
-			node.style.height = `${newHeight}px`;
-			if (newHeight >= maxHeight) {
-				node.style.overflowY = "auto";
-			} else {
-				node.style.overflowY = "hidden";
-			}
-		}
-
-		node.addEventListener("input", resize);
-		resize();
-
-		return {
-			destroy() {
-				node.removeEventListener("input", resize);
-			},
-		};
+	function handleDeletion() {
+		dispatch("confirmDelete", { id: item.id });
 	}
 </script>
 
-<button class={className} {...itemDialogTrigger} use:itemDialogTrigger />
+<button class="z-20" {...itemDialogTrigger} use:itemDialogTrigger>
+	<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="size-6 stroke-outer-space-500">
+		<path d="M21 4H8l-7 8 7 8h13a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2z" />
+		<line x1="18" y1="9" x2="12" y2="15" />
+		<line x1="12" y1="9" x2="18" y2="15" />
+	</svg>
+</button>
 
 {#if $isItemDialogOpen}
 	<div {...$itemDialogPortalled} use:itemDialogPortalled>
@@ -63,11 +40,13 @@
 		<div class="fixed left-1/2 top-1/2 z-50 transform -translate-x-1/2 -translate-y-1/2 w-full max-w-screen-lg" {...$itemDialogContent} use:itemDialogContent transition:scale={{ duration: 250, easing: quintOut, start: 0.9 }}>
 			<div class="w-full px-6">
 				<div class="p-6 bg-outer-space-100 shadow-lg rounded-lg flex flex-col">
-					<span class="mb-6 text-base/normal text-center font-medium break-words whitespace-normal">{item.text}</span>
-					<textarea class="p-3 border border-outer-space-300 bg-transparent rounded-md placeholder:text-outer-space-600 text-outer-space-800" placeholder="Write additional notes for this item." bind:value={item.note} use:autoResizeTextarea />
-					<div class="flex items-center justify-between">
+					<p class="my-6 text-center text-lg/normal font-normal break-words whitespace-normal max-w-sm mx-auto">
+						Are you sure you want to remove <span class="text-lg/normal font-medium">{item.text}</span>?
+					</p>
+
+					<div class="flex items-center justify-between gap-x-6">
 						<button class="mt-6 text-base/normal font-semibold text-outer-space-900" {...$itemDialogClose} use:itemDialogClose> Cancel </button>
-						<button class="mt-6 text-base/normal font-semibold text-outer-space-900" {...$itemDialogClose} use:itemDialogClose on:click|stopPropagation={handleSave}>Save</button>
+						<button class="mt-6 text-base/normal font-semibold text-outer-space-900" on:click|stopPropagation={handleDeletion}>Remove</button>
 					</div>
 				</div>
 			</div>
