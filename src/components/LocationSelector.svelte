@@ -25,18 +25,13 @@
 	});
 
 	function detectMobile() {
-		if (typeof window !== "undefined") {
-			isMobile = window.innerWidth <= 768;
-		}
+		isMobile = window.innerWidth <= 768;
 	}
 
 	function selectLocation(location: string) {
 		selectedLocation = location;
-		if (isMobile) {
-			isDialogOpen.set(false);
-		} else {
-			isDropdownOpen.set(false);
-		}
+		const stateSetter = isMobile ? isDialogOpen : isDropdownOpen;
+		stateSetter.set(false);
 	}
 
 	$: if ($isDropdownOpen) {
@@ -56,8 +51,8 @@
 	}
 
 	onMount(() => {
-		detectMobile();
 		if (typeof window !== "undefined") {
+			detectMobile();
 			window.addEventListener("resize", detectMobile);
 
 			const savedLocation = localStorage.getItem("savedLocation");
@@ -79,7 +74,7 @@
 		}
 	});
 
-	$: if (typeof window !== "undefined" && mounted) {
+	$: if (mounted) {
 		localStorage.setItem("savedLocation", selectedLocation);
 	}
 </script>
