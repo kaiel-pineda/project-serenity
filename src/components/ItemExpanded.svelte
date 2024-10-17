@@ -62,7 +62,7 @@
 
 		<div class="fixed left-1/2 top-1/2 z-50 transform -translate-x-1/2 -translate-y-1/2 w-full max-w-screen-lg" {...$itemDialogContent} use:itemDialogContent transition:scale={{ duration: 250, easing: quintOut, start: 0.9 }}>
 			<div class="w-full px-6">
-				<div class="p-6 bg-outer-space-100 shadow-lg rounded-lg flex flex-col">
+				<div class="p-6 bg-outer-space-100 shadow-xl rounded-xl flex flex-col">
 					<span class="mb-6 text-base/normal text-center font-medium break-words whitespace-normal">{item.text}</span>
 					<textarea class="p-3 border border-outer-space-300 bg-transparent rounded-md placeholder:text-outer-space-600 text-outer-space-800" placeholder="Write additional notes for this item." bind:value={item.note} use:autoResizeTextarea />
 					<div class="flex items-center justify-between">

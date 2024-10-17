@@ -39,13 +39,14 @@
 
 		<div class="fixed left-1/2 top-1/2 z-50 transform -translate-x-1/2 -translate-y-1/2 w-full max-w-screen-lg" {...$itemDialogContent} use:itemDialogContent transition:scale={{ duration: 250, easing: quintOut, start: 0.9 }}>
 			<div class="w-full px-6">
-				<div class="p-6 bg-outer-space-100 shadow-lg rounded-lg flex flex-col">
-					<p class="my-6 text-center text-lg/normal font-normal break-words whitespace-normal max-w-sm mx-auto">
-						Are you sure you want to remove <span class="text-lg/normal font-medium">{item.text}</span>?
+				<div class="p-6 bg-outer-space-100 shadow-xl rounded-xl flex flex-col">
+					<p class="my-6 text-center text-base/normal font-normal break-words whitespace-normal max-w-sm mx-auto">
+						Are you sure you want to remove <br/> 
+						<span class="text-lg/normal font-medium">{item.text}</span>?
 					</p>
 
-					<div class="flex items-center justify-between gap-x-6">
-						<button class="mt-6 text-base/normal font-semibold text-outer-space-900" {...$itemDialogClose} use:itemDialogClose> Cancel </button>
+					<div class="flex items-center justify-end gap-x-6">
+						<button class="mt-6 text-base/normal font-semibold text-outer-space-900" {...$itemDialogClose} use:itemDialogClose>Cancel</button>
 						<button class="mt-6 text-base/normal font-semibold text-outer-space-900" on:click|stopPropagation={handleDeletion}>Remove</button>
 					</div>
 				</div>
