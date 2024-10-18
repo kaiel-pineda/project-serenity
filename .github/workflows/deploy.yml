@@ -2,7 +2,6 @@ name: Deploy to GitHub Pages
 
 on:
   # Trigger the workflow every time you push to the `main` branch
-  # Using a different branch name? Replace `main` with your branch’s name
   push:
     branches: [ main ]
   # Allows you to run this workflow manually from the Actions tab on GitHub.
@@ -20,12 +19,28 @@ jobs:
     steps:
       - name: Checkout your repository using git
         uses: actions/checkout@v3
+
+      - name: Generate Version String
+        id: versioning
+        run: |
+          YEAR=$(date +'%Y')
+          WEEK=$(date +'%V')
+          COMMITS=$(git rev-list --count HEAD)
+          HASH=$(git rev-parse --short HEAD)
+          VERSION="${YEAR}.${WEEK}.${COMMITS}+${HASH}"
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
+
+      - name: Create or Replace Version File
+        run: |
+          echo "export const version: string = '$VERSION';" > src/version.ts
+
       - name: Install, build, and upload your site
         uses: withastro/action@v1
+        # Uncomment and modify the following if necessary:
         # with:
-          # path: . # The root location of your Astro project inside the repository. (optional)
-          # node-version: 18 # The specific version of Node that should be used to build your site. Defaults to 18. (optional)
-          # package-manager: pnpm@latest # The Node package manager that should be used to install dependencies and build your site. Automatically detected based on your lockfile. (optional)
+        #   path: . # The root location of your Astro project inside the repository. (optional)
+        #   node-version: 18 # The specific version of Node that should be used to build your site. Defaults to 18. (optional)
+        #   package-manager: pnpm@latest # The Node package manager used to install dependencies and build your site. Automatically detected based on your lockfile. (optional)
 
   deploy:
     needs: build
