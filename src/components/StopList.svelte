@@ -1,227 +1,224 @@
 <script lang="ts">
-	import { onMount } from "svelte";
-	import StopItem from "./StopItem.svelte";
-	import ItemInput from "./ItemInput.svelte";
-	import { addToast } from "./ToastNotification.svelte";
-	import { isPickups } from "../stores/pickupsStore";
+    import { onMount } from 'svelte';
+    import StopItem from './StopItem.svelte';
+    import ItemInput from './ItemInput.svelte';
+    import { addToast } from './ToastNotification.svelte';
+    import { isPickups } from '../stores/store';
+    import type { StopItemData } from '../types/types';
 
-	interface StopItemData {
-		id: number;
-		text: string;
-		status: boolean;
-		isEditing: boolean;
-		note?: string;
-		originalText?: string;
-	}
+    type RearrangedList = { left: StopItemData[]; right: StopItemData[] };
+    type Column = 'left' | 'right';
 
-	let pickupList: StopItemData[] = [];
-	let deliveryList: StopItemData[] = [];
+    const columns: Column[] = ['left', 'right'];
 
-	let rearrangedPickupList = { left: [], right: [] };
-	let rearrangedDeliveryList = { left: [], right: [] };
+    let pickupList: StopItemData[] = [];
+    let deliveryList: StopItemData[] = [];
 
-	$: currentList = $isPickups ? pickupList : deliveryList;
-	$: rearrangedCurrentList = $isPickups ? rearrangedPickupList : rearrangedDeliveryList;
+    let rearrangedPickupList: RearrangedList = { left: [], right: [] };
+    let rearrangedDeliveryList: RearrangedList = { left: [], right: [] };
 
-	onMount(() => {
-		const savedPickupList = localStorage.getItem("pickupList");
-		if (savedPickupList) {
-			pickupList = JSON.parse(savedPickupList).map((item: StopItemData) => ({
-				...item,
-				isEditing: false,
-			}));
-		}
+    $: currentList = $isPickups ? pickupList : deliveryList;
+    $: rearrangedCurrentList = $isPickups ? rearrangedPickupList : rearrangedDeliveryList;
 
-		const savedDeliveryList = localStorage.getItem("deliveryList");
-		if (savedDeliveryList) {
-			deliveryList = JSON.parse(savedDeliveryList).map((item: StopItemData) => ({
-				...item,
-				isEditing: false,
-			}));
-		}
+    onMount(() => {
+        const savedPickupList = localStorage.getItem('pickupList');
+        if (savedPickupList) {
+            pickupList = JSON.parse(savedPickupList).map((item: StopItemData) => ({
+                ...item,
+                isEditing: false,
+            }));
+        }
 
-		updateDisplayLists();
-	});
+        const savedDeliveryList = localStorage.getItem('deliveryList');
+        if (savedDeliveryList) {
+            deliveryList = JSON.parse(savedDeliveryList).map((item: StopItemData) => ({
+                ...item,
+                isEditing: false,
+            }));
+        }
 
-	function rearrangeItemsForColumns(items: StopItemData[]) {
-		const leftColumn: StopItemData[] = [];
-		const rightColumn: StopItemData[] = [];
+        updateDisplayLists();
+    });
 
-		items.forEach((item, index) => {
-			if (index % 2 === 0) {
-				leftColumn.push(item);
-			} else {
-				rightColumn.push(item);
-			}
-		});
+    function rearrangeItemsForColumns(items: StopItemData[]) {
+        const leftColumn: StopItemData[] = [];
+        const rightColumn: StopItemData[] = [];
 
-		return { left: leftColumn, right: rightColumn };
-	}
+        items.forEach((item, index) => {
+            if (index % 2 === 0) {
+                leftColumn.push(item);
+            } else {
+                rightColumn.push(item);
+            }
+        });
 
-	function updateDisplayLists() {
-		rearrangedPickupList = rearrangeItemsForColumns(pickupList);
-		rearrangedDeliveryList = rearrangeItemsForColumns(deliveryList);
-	}
+        return { left: leftColumn, right: rightColumn };
+    }
 
-	function updateLocalStorage() {
-		localStorage.setItem("pickupList", JSON.stringify(pickupList));
-		localStorage.setItem("deliveryList", JSON.stringify(deliveryList));
-	}
+    function updateDisplayLists() {
+        rearrangedPickupList = rearrangeItemsForColumns(pickupList);
+        rearrangedDeliveryList = rearrangeItemsForColumns(deliveryList);
+    }
 
-	function getCurrentList() {
-		return $isPickups ? pickupList : deliveryList;
-	}
+    function updateLocalStorage() {
+        localStorage.setItem('pickupList', JSON.stringify(pickupList));
+        localStorage.setItem('deliveryList', JSON.stringify(deliveryList));
+    }
 
-	function updateCurrentList(updatedList: StopItemData[]) {
-		if ($isPickups) {
-			pickupList = updatedList;
-		} else {
-			deliveryList = updatedList;
-		}
-		updateLocalStorage();
-		updateDisplayLists();
-	}
+    function getCurrentList() {
+        return $isPickups ? pickupList : deliveryList;
+    }
 
-	function removeFromList(itemId: number) {
-		const currentList = getCurrentList();
-		const updatedList = currentList.filter((item) => item.id !== itemId);
-		const removedItem = currentList.find((item) => item.id === itemId);
+    function updateCurrentList(updatedList: StopItemData[]) {
+        if ($isPickups) {
+            pickupList = updatedList;
+        } else {
+            deliveryList = updatedList;
+        }
+        updateLocalStorage();
+        updateDisplayLists();
+    }
 
-		if (removedItem) {
-			addToast({
-				data: {
-					title: "Stop Removed",
-					description: `"${removedItem.text}" has been successfully removed.`,
-					background: "bg-puerto-rico-500",
-				},
-			});
-		}
+    function removeFromList(itemId: number) {
+        const currentList = getCurrentList();
+        const updatedList = currentList.filter((item) => item.id !== itemId);
+        const removedItem = currentList.find((item) => item.id === itemId);
 
-		updateCurrentList(updatedList);
-	}
+        if (removedItem) {
+            addToast({
+                data: {
+                    title: 'Stop Removed',
+                    description: `"${removedItem.text}" has been successfully removed.`,
+                    background: 'bg-puerto-rico-500',
+                },
+            });
+        }
 
-	function toggleStatus(itemId: number) {
-		const item = getCurrentList().find((item) => item.id === itemId);
-		if (item) {
-			updateItem(itemId, { status: !item.status });
-		}
-	}
+        updateCurrentList(updatedList);
+    }
 
-	function toggleEdit(itemId: number) {
-		const item = getCurrentList().find((item) => item.id === itemId);
-		if (item) {
-			updateItem(itemId, { isEditing: !item.isEditing, originalText: item.text });
-		}
-	}
+    function toggleStatus(itemId: number) {
+        const item = getCurrentList().find((item) => item.id === itemId);
+        if (item) {
+            updateItem(itemId, { status: !item.status });
+        }
+    }
 
-	function updateItem(itemId: number, updatedFields: Partial<StopItemData>) {
-		const updatedList = getCurrentList().map((item) => (item.id === itemId ? { ...item, ...updatedFields } : item));
-		updateCurrentList(updatedList);
-	}
+    function toggleEdit(itemId: number) {
+        const item = getCurrentList().find((item) => item.id === itemId);
+        if (item) {
+            updateItem(itemId, { isEditing: !item.isEditing, originalText: item.text });
+        }
+    }
 
-	function editItem(itemId: number, newText: string) {
-		const trimmedText = newText.trim();
-		const currentList = getCurrentList();
-		const item = currentList.find((item) => item.id === itemId);
+    function updateItem(itemId: number, updatedFields: Partial<StopItemData>) {
+        const updatedList = getCurrentList().map((item) => (item.id === itemId ? { ...item, ...updatedFields } : item));
+        updateCurrentList(updatedList);
+    }
 
-		if (!item) return;
+    function editItem(itemId: number, newText: string) {
+        const trimmedText = newText.trim();
+        const currentList = getCurrentList();
+        const item = currentList.find((item) => item.id === itemId);
 
-		const isDuplicate = currentList.some((otherItem) => otherItem.text.toLowerCase() === trimmedText.toLowerCase() && otherItem.id !== itemId);
+        if (!item) return;
 
-		if (isDuplicate) {
-			addToast({
-				data: {
-					title: "Input Warning",
-					description: `"${trimmedText}" already exists.`,
-					background: "bg-brandy-punch-500",
-				},
-			});
+        const isDuplicate = currentList.some((otherItem) => otherItem.text.toLowerCase() === trimmedText.toLowerCase() && otherItem.id !== itemId);
 
-			updateItem(itemId, { text: item.originalText });
-			return;
-		}
+        if (isDuplicate) {
+            addToast({
+                data: {
+                    title: 'Input Warning',
+                    description: `"${trimmedText}" already exists.`,
+                    background: 'bg-brandy-punch-500',
+                },
+            });
 
-		updateItem(itemId, { text: trimmedText, isEditing: false });
-	}
+            updateItem(itemId, { text: item.originalText });
+            return;
+        }
 
-	function clearAll() {
-		updateCurrentList([]);
-	}
+        updateItem(itemId, { text: trimmedText, isEditing: false });
+    }
 
-	function getStopLabel(count: number, isPickups: boolean) {
-		if (isPickups) {
-			if (count === 0) return "No Pick-Ups";
-			if (count === 1) return "1 Pick-Up";
-			return `${count} Pick-Ups`;
-		} else {
-			if (count === 0) return "No Deliveries";
-			if (count === 1) return "1 Delivery";
-			return `${count} Deliveries`;
-		}
-	}
+    function clearAll() {
+        updateCurrentList([]);
+    }
 
-	export function focusInput(node: HTMLInputElement) {
-		requestAnimationFrame(() => {
-			node.focus();
-			node.select();
-		});
-	}
+    function getStopLabel(count: number, isPickups: boolean) {
+        if (isPickups) {
+            if (count === 0) return 'No Pick-Ups';
+            if (count === 1) return '1 Pick-Up';
+            return `${count} Pick-Ups`;
+        } else {
+            if (count === 0) return 'No Deliveries';
+            if (count === 1) return '1 Delivery';
+            return `${count} Deliveries`;
+        }
+    }
 
-	function handleAddItem(event: CustomEvent<{ text: string }>) {
-		const { text } = event.detail;
-		const currentList = getCurrentList();
+    export function focusInput(node: HTMLInputElement) {
+        requestAnimationFrame(() => {
+            node.focus();
+            node.select();
+        });
+    }
 
-		const isDuplicate = currentList.some((item) => item.text.toLowerCase() === text.toLowerCase());
+    function handleAddItem(event: CustomEvent<{ text: string }>) {
+        const { text } = event.detail;
+        const currentList = getCurrentList();
 
-		if (isDuplicate) {
-			addToast({
-				data: {
-					title: "Input Warning",
-					description: `"${text}" already exists.`,
-					background: "bg-brandy-punch-500",
-				},
-			});
-			return;
-		}
+        const isDuplicate = currentList.some((item) => item.text.toLowerCase() === text.toLowerCase());
 
-		const newItem: StopItemData = {
-			id: Date.now(),
-			text,
-			status: false,
-			isEditing: false,
-		};
+        if (isDuplicate) {
+            addToast({
+                data: {
+                    title: 'Input Warning',
+                    description: `"${text}" already exists.`,
+                    background: 'bg-brandy-punch-500',
+                },
+            });
+            return;
+        }
 
-		updateCurrentList([...currentList, newItem]);
-	}
+        const newItem: StopItemData = {
+            id: Date.now(),
+            text,
+            status: false,
+            isEditing: false,
+        };
+
+        updateCurrentList([...currentList, newItem]);
+    }
 </script>
 
-<main class="flex flex-col gap-y-6 h-full w-full">
-	<div class="flex flex-col gap-y-6 flex-1">
-		<header>
-			<div class="container mx-auto px-6">
-				<div class="flex items-center justify-between gap-x-3">
-					<span class="text-lg font-medium py-3">
-						{getStopLabel(currentList.length, $isPickups)}
-					</span>
-					{#if currentList.length > 0}
-						<button class="rounded-full bg-old-gold-500 py-3 px-4 font-semibold text-white" on:click={clearAll}>Clear List</button>
-					{/if}
-				</div>
-			</div>
-		</header>
+<main class="flex h-full w-full flex-col gap-y-6">
+    <div class="flex flex-1 flex-col gap-y-6">
+        <header>
+            <div class="container mx-auto px-6">
+                <div class="flex items-center justify-between gap-x-3">
+                    <span class="py-3 text-lg/normal font-medium">
+                        {getStopLabel(currentList.length, $isPickups)}
+                    </span>
+                    {#if currentList.length > 0}
+                        <button class="rounded-full bg-old-gold-500 px-4 py-3 font-semibold text-white" on:click={clearAll}>Clear List</button>
+                    {/if}
+                </div>
+            </div>
+        </header>
 
-		<section class="container mx-auto px-6 flex-1">
-			<div class="grid grid-cols-2 gap-x-6">
-				{#each ["left", "right"] as column}
-					<div class="flex flex-col gap-y-6">
-						{#each rearrangedCurrentList[column] as item (item.id)}
-							<StopItem {item} onEdit={() => toggleEdit(item.id)} onToggleStatus={() => toggleStatus(item.id)} onSaveNote={(note) => updateItem(item.id, { note })} onDelete={() => removeFromList(item.id)} onEditItem={(newText) => editItem(item.id, newText)} />
-						{/each}
-					</div>
-				{/each}
-			</div>
-		</section>
+        <section class="container mx-auto flex-1 px-6">
+            <div class="grid grid-cols-2 gap-x-6">
+                {#each columns as column}
+                    <div class="flex flex-col gap-y-6">
+                        {#each rearrangedCurrentList[column] as item (item.id)}
+                            <StopItem {item} onEdit={() => toggleEdit(item.id)} onToggleStatus={() => toggleStatus(item.id)} onSaveNote={(note) => updateItem(item.id, { note })} onDelete={() => removeFromList(item.id)} onEditItem={(newText) => editItem(item.id, newText)} />
+                        {/each}
+                    </div>
+                {/each}
+            </div>
+        </section>
 
-		<ItemInput on:addItem={handleAddItem} />
-	</div>
+        <ItemInput on:addItem={handleAddItem} />
+    </div>
 </main>
