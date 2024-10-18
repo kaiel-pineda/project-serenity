@@ -1,5 +1,6 @@
 <script lang="ts">
     import { createEventDispatcher } from 'svelte';
+    import { version } from '../version.ts';
 
     const dispatch = createEventDispatcher();
 
@@ -21,7 +22,7 @@
 
 <footer class={`sticky bottom-0 z-30 transition-colors duration-200 ease-in-out ${showInput ? 'bg-white' : 'bg-transparent'}`}>
     <div class="container mx-auto px-6">
-        <div class="mb-6 flex flex-col justify-center">
+        <div class="flex flex-col justify-center">
             <div class="flex w-full items-center justify-between gap-x-6">
                 <div class={showInput ? 'flex w-full items-center justify-between overflow-hidden rounded-full bg-fuscous-gray-500 p-3 transition-[width] duration-200 ease-[cubic-bezier(0.4,0,0.2,1)]' : 'relative w-24 rounded-full bg-fuscous-gray-500 px-12 py-7 font-semibold text-fuscous-gray-50 transition-[width] duration-200 ease-[cubic-bezier(0.4,0,0.2,1)]'}>
                     <button class={showInput ? 'mr-3 rounded-full bg-fuscous-gray-600 px-3 py-1 text-base/normal font-semibold text-fuscous-gray-50 transition-all duration-100 ease-[cubic-bezier(0.25,0.8,0.5,1)]' : 'absolute inset-0'} on:click={toggleInputVisibility}>
@@ -53,6 +54,10 @@
                     {/if}
                 </div>
             </div>
+        </div>
+
+        <div class="my-1 flex items-center justify-center">
+            <span class="text-xs/normal text-neutral-400 font-medium">{version}</span>
         </div>
     </div>
 </footer>
