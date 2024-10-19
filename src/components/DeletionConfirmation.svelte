@@ -40,7 +40,7 @@
         <div class="fixed left-1/2 top-1/2 z-50 w-full max-w-screen-lg -translate-x-1/2 -translate-y-1/2 transform" {...$itemDialogContent} use:itemDialogContent transition:scale={{ duration: 250, easing: quintOut, start: 0.9 }}>
             <div class="w-full px-6">
                 <div class="flex flex-col rounded-xl bg-outer-space-100 p-6 shadow-xl">
-                    <div class="mx-auto mb-3 mt-6 flex max-w-sm flex-col gap-y-3 whitespace-normal break-words text-center">
+                    <div class="mx-auto mb-4 mt-6 flex max-w-sm flex-col gap-y-2 whitespace-normal break-words text-center">
                         <p class="text-base/normal font-normal">Remove this stop from the list?</p>
                         <span class="text-lg/normal font-medium">{item.text}</span>
                     </div>

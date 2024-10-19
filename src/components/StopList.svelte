@@ -201,7 +201,9 @@
                         {getStopLabel(currentList.length, $isPickups)}
                     </span>
                     {#if currentList.length > 0}
-                        <button class="rounded-full bg-old-gold-500 px-4 py-3 font-semibold text-white" on:click={clearAll}>Clear List</button>
+                        <button class="rounded-full bg-old-gold-500 px-4 py-3" on:click={clearAll}>
+                            <span class="text-base/normal font-semibold text-white">Clear List</span>
+                        </button>
                     {/if}
                 </div>
             </div>

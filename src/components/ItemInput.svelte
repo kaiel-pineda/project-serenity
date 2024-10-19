@@ -1,5 +1,7 @@
 <script lang="ts">
     import { createEventDispatcher } from 'svelte';
+    import html2canvas from 'html2canvas';
+    import { addToast } from './ToastNotification.svelte';
     import { version } from '../version.ts';
 
     const dispatch = createEventDispatcher();
@@ -17,6 +19,66 @@
 
     function toggleInputVisibility() {
         showInput = !showInput;
+    }
+
+    function generateCaptureFilename() {
+        const now = new Date();
+        const timestamp = now.toISOString().replace(/[-:.]/g, '');
+        return `route-captured-${timestamp}.png`;
+    }
+
+    function captureElement() {
+        const element = document.querySelector('#capture-target');
+        if (element) {
+            const style = document.createElement('style');
+            document.head.appendChild(style);
+            style.sheet?.insertRule('body > div:last-child img { display: inline-block; }');
+
+            html2canvas(element, {
+                scrollX: 0,
+                scrollY: 0,
+                windowWidth: element.scrollWidth,
+                windowHeight: element.scrollHeight,
+            })
+                .then((canvas) => {
+                    const dataURL = canvas.toDataURL('image/png');
+
+                    const link = document.createElement('a');
+                    link.href = dataURL;
+                    link.download = generateCaptureFilename();
+                    link.click();
+
+                    addToast({
+                        data: {
+                            title: 'Capture Success',
+                            description: 'Your screenshot has been saved successfully.',
+                            background: 'bg-puerto-rico-500',
+                        },
+                    });
+
+                    style.remove();
+                    link.remove();
+                })
+                .catch((error) => {
+                    addToast({
+                        data: {
+                            title: 'Capture Failed',
+                            description: 'An error occurred while capturing the screenshot.',
+                            background: 'bg-brandy-punch-500',
+                        },
+                    });
+
+                    style.remove();
+                });
+        } else {
+            addToast({
+                data: {
+                    title: 'Capture Failed',
+                    description: 'Could not find the element to capture.',
+                    background: 'bg-brandy-punch-500',
+                },
+            });
+        }
     }
 </script>
 
@@ -53,6 +115,15 @@
                         </button>
                     {/if}
                 </div>
+
+                {#if !showInput}
+                    <button class="flex items-center justify-center rounded-full bg-old-gold-500 p-4 transition-transform duration-200 ease-[cubic-bezier(0.4,0,0.2,1)]" on:click={captureElement}>
+                        <svg xmlns="http://www.w3.org/2000/svg" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="size-6 stroke-white" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                            <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" />
+                            <circle cx="12" cy="13" r="4" />
+                        </svg>
+                    </button>
+                {/if}
             </div>
 
             {#if showInput}

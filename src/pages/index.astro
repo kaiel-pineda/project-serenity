@@ -13,7 +13,7 @@ import ToastNotification from '../components/ToastNotification.svelte';
 		<title>MyRoute | Delivery Verification Helper</title>
 	</head>
 	<body>
-		<div class='flex h-screen flex-col'>
+		<div class='flex h-screen flex-col' id="capture-target">
 			<LocationSelector client:load />
 			<StopList client:load />
 			<ToastNotification client:idle />
