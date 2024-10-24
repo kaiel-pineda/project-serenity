@@ -17,9 +17,35 @@
         return `${filenamePrefix}-${timestamp}.png`;
     }
 
+    function replaceTextareaWithDiv() {
+        const textarea = document.querySelector('textarea');
+        if (!textarea) return null;
+
+        const div = document.createElement('div');
+        const computedStyle = window.getComputedStyle(textarea);
+
+        for (let i = 0; i < computedStyle.length; i++) {
+            const prop = computedStyle[i];
+            div.style.setProperty(prop, computedStyle.getPropertyValue(prop), computedStyle.getPropertyPriority(prop));
+        }
+
+        div.textContent = textarea.value;
+        div.style.whiteSpace = 'pre-wrap';
+        div.style.overflowY = 'auto';
+        div.style.height = `${textarea.scrollHeight}px`;
+
+        textarea.parentNode.replaceChild(div, textarea);
+
+        return function restoreTextarea() {
+            div.parentNode.replaceChild(textarea, div);
+        };
+    }
+
     function captureElement() {
         const element = document.querySelector(targetSelector) as HTMLElement;
         if (element) {
+            const restoreTextarea = replaceTextareaWithDiv();
+
             const style = document.createElement('style');
             document.head.appendChild(style);
             style.sheet?.insertRule('body > div:last-child img { display: inline-block; }');
@@ -31,11 +57,16 @@
                 windowHeight: element.scrollHeight,
             })
                 .then((canvas) => {
+                    restoreTextarea && restoreTextarea();
+
                     const dataURL = canvas.toDataURL('image/png');
                     const link = document.createElement('a');
                     link.href = dataURL;
                     link.download = generateCaptureFilename();
                     link.click();
+
+                    style.remove();
+                    link.remove();
 
                     dispatch('captureSuccess');
                     addToast({
@@ -45,11 +76,10 @@
                             background: 'bg-puerto-rico-500',
                         },
                     });
-
-                    style.remove();
-                    link.remove();
                 })
                 .catch(() => {
+                    restoreTextarea && restoreTextarea();
+
                     addToast({
                         data: {
                             title: 'Capture Failed',
