@@ -1,0 +1,77 @@
+<script lang="ts">
+    import html2canvas from 'html2canvas';
+    import { createEventDispatcher } from 'svelte';
+    import { addToast } from './ToastNotification.svelte';
+
+    const dispatch = createEventDispatcher();
+
+    export let targetSelector: string;
+    export let filenamePrefix = 'route-captured';
+
+    let className = '';
+    export { className as class };
+
+    function generateCaptureFilename() {
+        const now = new Date();
+        const timestamp = now.toISOString().replace(/[-:.]/g, '');
+        return `${filenamePrefix}-${timestamp}.png`;
+    }
+
+    function captureElement() {
+        const element = document.querySelector(targetSelector) as HTMLElement;
+        if (element) {
+            const style = document.createElement('style');
+            document.head.appendChild(style);
+            style.sheet?.insertRule('body > div:last-child img { display: inline-block; }');
+
+            html2canvas(element, {
+                scrollX: 0,
+                scrollY: 0,
+                windowWidth: element.scrollWidth,
+                windowHeight: element.scrollHeight,
+            })
+                .then((canvas) => {
+                    const dataURL = canvas.toDataURL('image/png');
+                    const link = document.createElement('a');
+                    link.href = dataURL;
+                    link.download = generateCaptureFilename();
+                    link.click();
+
+                    dispatch('captureSuccess');
+                    addToast({
+                        data: {
+                            title: 'Capture Success',
+                            description: 'Your screenshot has been saved successfully.',
+                            background: 'bg-puerto-rico-500',
+                        },
+                    });
+
+                    style.remove();
+                    link.remove();
+                })
+                .catch(() => {
+                    addToast({
+                        data: {
+                            title: 'Capture Failed',
+                            description: 'An error occurred while capturing the screenshot.',
+                            background: 'bg-brandy-punch-500',
+                        },
+                    });
+
+                    style.remove();
+                });
+        } else {
+            addToast({
+                data: {
+                    title: 'Capture Failed',
+                    description: 'Could not find the element to capture.',
+                    background: 'bg-brandy-punch-500',
+                },
+            });
+        }
+    }
+</script>
+
+<button class={className} on:click={captureElement}>
+    <slot />
+</button>

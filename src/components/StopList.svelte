@@ -20,6 +20,9 @@
     $: currentList = $isPickups ? pickupList : deliveryList;
     $: rearrangedCurrentList = $isPickups ? rearrangedPickupList : rearrangedDeliveryList;
 
+    $: remainingCount = currentList.filter((item) => !item.status).length;
+    $: stopLabel = getStopLabel(currentList.length, remainingCount, $isPickups);
+
     onMount(() => {
         const savedPickupList = localStorage.getItem('pickupList');
         if (savedPickupList) {
@@ -145,16 +148,21 @@
         updateCurrentList([]);
     }
 
-    function getStopLabel(count: number, isPickups: boolean) {
+    function getStopLabel(count: number, remaining: number, isPickups: boolean) {
+        let label = '';
         if (isPickups) {
-            if (count === 0) return 'No Pick-Ups';
-            if (count === 1) return '1 Pick-Up';
-            return `${count} Pick-Ups`;
+            if (count === 0) label = 'No Pick-Ups';
+            else if (count === 1) label = '1 Pick-Up';
+            else label = `${count} Pick-Ups`;
         } else {
-            if (count === 0) return 'No Deliveries';
-            if (count === 1) return '1 Delivery';
-            return `${count} Deliveries`;
+            if (count === 0) label = 'No Deliveries';
+            else if (count === 1) label = '1 Delivery';
+            else label = `${count} Deliveries`;
         }
+        return {
+            label,
+            remainingText: remaining > 0 ? `(${remaining} Remaining)` : '',
+        };
     }
 
     export function focusInput(node: HTMLInputElement) {
@@ -197,9 +205,16 @@
         <header>
             <div class="container mx-auto px-6">
                 <div class="flex items-center justify-between gap-x-3">
-                    <span class="py-3 text-lg/normal font-medium">
-                        {getStopLabel(currentList.length, $isPickups)}
-                    </span>
+                    <div class="flex items-center gap-x-3 py-3">
+                        <span class="text-lg/normal font-medium text-fuscous-gray-900">
+                            {stopLabel.label}
+                        </span>
+                        {#if stopLabel.remainingText}
+                            <span class="text-base/normal text-fuscous-gray-500">
+                                {stopLabel.remainingText}
+                            </span>
+                        {/if}
+                    </div>
                     {#if currentList.length > 0}
                         <button class="rounded-full bg-old-gold-500 px-4 py-3" on:click={clearAll}>
                             <span class="text-base/normal font-semibold text-white">Clear List</span>

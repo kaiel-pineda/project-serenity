@@ -3,6 +3,7 @@
     import { createDialog } from '@melt-ui/svelte';
     import { fade, scale } from 'svelte/transition';
     import { quintOut } from 'svelte/easing';
+    import ScreenshotButton from './ScreenshotButton.svelte';
 
     interface StopItem {
         id: number;
@@ -67,13 +68,23 @@
         <div class="fixed inset-0 z-50 bg-black/50" {...$itemDialogOverlay} use:itemDialogOverlay transition:fade={{ duration: 200, easing: quintOut }} />
 
         <div class="fixed left-1/2 top-1/2 z-50 w-full max-w-screen-lg -translate-x-1/2 -translate-y-1/2 transform" {...$itemDialogContent} use:itemDialogContent transition:scale={{ duration: 250, easing: quintOut, start: 0.9 }}>
-            <div class="w-full px-6">
+            <div class="w-full px-6" id="capture-modal">
                 <div class="flex flex-col rounded-xl bg-outer-space-100 p-6 shadow-xl">
                     <span class="mb-6 whitespace-normal break-words text-center text-base/normal font-medium">{item.text}</span>
                     <textarea class="rounded-md border border-outer-space-300 bg-transparent p-3 text-outer-space-800 placeholder:text-outer-space-600" placeholder="Enter additional notes for this stop." bind:value={item.note} use:autoResizeTextarea />
-                    <div class="flex items-center justify-end gap-x-6">
-                        <button class="mt-6 text-base/normal font-semibold text-outer-space-900" {...$itemDialogClose} use:itemDialogClose> Cancel </button>
-                        <button class="mt-6 text-base/normal font-semibold text-outer-space-900" {...$itemDialogClose} use:itemDialogClose on:click|stopPropagation={handleSave}>Save</button>
+                    <div class="flex items-center justify-between mt-6">
+                        <div class="flex items-center">
+                            <ScreenshotButton class="flex items-center justify-center rounded-full p-3 bg-outer-space-200" targetSelector="#capture-modal">
+                                <svg xmlns="http://www.w3.org/2000/svg" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="size-6 stroke-outer-space-700" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                    <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" />
+                                    <circle cx="12" cy="13" r="4" />
+                                </svg>
+                            </ScreenshotButton>
+                        </div>
+                        <div class="flex gap-x-6">
+                            <button class="text-base/normal font-semibold text-outer-space-900 bg-transparent border-transparent" {...$itemDialogClose} use:itemDialogClose>Cancel</button>
+                            <button class="text-base/normal font-semibold text-outer-space-900 bg-transparent border-transparent" {...$itemDialogClose} use:itemDialogClose on:click|stopPropagation={handleSave}>Save</button>
+                        </div>
                     </div>
                 </div>
             </div>
