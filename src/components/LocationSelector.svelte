@@ -1,6 +1,6 @@
 <script lang="ts">
     import { onMount, onDestroy } from 'svelte';
-    import { createDropdownMenu, createDialog } from '@melt-ui/svelte';
+    import { createDropdownMenu, createDialog, createTooltip, createSwitch } from '@melt-ui/svelte';
     import { fly, fade } from 'svelte/transition';
     import { quintOut, quintIn, backOut, cubicOut } from 'svelte/easing';
     import { isPickups } from '../stores/store';
@@ -9,6 +9,10 @@
     let selectedLocation: string = locations[0];
     let isMobile = false;
     let mounted = false;
+
+    let autoToggleEnabled = false;
+    let autoToggleTime = "12:00";
+    let autoToggleInterval: number | undefined;
 
     const {
         elements: { trigger: dropdownTrigger, menu: dropdownMenu, item: dropdownItem, overlay: dropdownOverlay },
@@ -23,6 +27,22 @@
     } = createDialog({
         forceVisible: true,
     });
+
+    const {
+        elements: { trigger: tooltipTrigger, content: tooltipContent, arrow:tooltipArrow },
+        states: { open: isTooltipOpen },
+    } = createTooltip({
+        positioning: {
+            placement: 'bottom',
+        },
+        openDelay: 500,
+        closeOnPointerDown: false,
+        forceVisible: true,
+    });
+
+    const {
+        elements: { root: timeSwitchRoot, input: timeSwitchInput },
+    } = createSwitch();
 
     function detectMobile() {
         isMobile = window.innerWidth <= 768;
@@ -43,11 +63,37 @@
     }
 
     function togglePickups() {
+        if (autoToggleEnabled) {
+            autoToggleEnabled = false;
+            localStorage.setItem('autoToggleEnabled', 'false');
+            clearInterval(autoToggleInterval);
+        }
+
         isPickups.update((value) => {
             const newValue = !value;
             localStorage.setItem('isPickups', JSON.stringify(newValue));
             return newValue;
         });
+    }
+
+    function checkAutoToggleTime() {
+        if (!autoToggleEnabled) return;
+
+        const [hour, minute] = autoToggleTime.split(":").map(Number);
+        const now = new Date();
+        const currentTimeInMinutes = now.getHours() * 60 + now.getMinutes();
+        const targetTimeInMinutes = hour * 60 + minute;
+
+        // Toggle `isPickups` based on the time comparison
+        if (currentTimeInMinutes >= targetTimeInMinutes) {
+            isPickups.set(true);
+        } else {
+            isPickups.set(false);
+        }
+    }
+
+    if (autoToggleEnabled) {
+        autoToggleInterval = setInterval(checkAutoToggleTime, 60000);
     }
 
     onMount(() => {
@@ -64,6 +110,18 @@
             if (savedPickups !== null) {
                 isPickups.set(JSON.parse(savedPickups));
             }
+
+            const savedAutoToggleEnabled = localStorage.getItem('autoToggleEnabled');
+            autoToggleEnabled = savedAutoToggleEnabled === "true";
+
+            const savedAutoToggleTime = localStorage.getItem('autoToggleTime');
+            if (savedAutoToggleTime) {
+                autoToggleTime = savedAutoToggleTime;
+            }
+
+            if (autoToggleEnabled) {
+                checkAutoToggleTime();
+            }
         }
         mounted = true;
     });
@@ -72,6 +130,7 @@
         if (typeof window !== 'undefined') {
             window.removeEventListener('resize', detectMobile);
         }
+        clearInterval(autoToggleInterval);
     });
 
     $: if (mounted) {
@@ -101,17 +160,8 @@
                         class="absolute z-50 mt-3 min-w-52 rounded-lg bg-outer-space-100 py-3 shadow-lg"
                         {...dropdownMenu}
                         use:dropdownMenu
-                        in:fly={{
-                            y: -10,
-                            duration: 300,
-                            easing: backOut,
-                        }}
-                        out:fly={{
-                            y: -10,
-                            duration: 400,
-                            easing: cubicOut,
-                            delay: 20,
-                        }}>
+                        in:fly={{ y: -10, duration: 300, easing: backOut }}
+                        out:fly={{ y: -10, duration: 400, easing: cubicOut, delay: 20 }}>
                         {#each locations as location}
                             <button class="block w-full p-3 text-left text-sm/normal font-medium text-outer-space-900" {...dropdownItem} use:dropdownItem on:click={() => selectLocation(location)}>
                                 {location}
@@ -132,17 +182,8 @@
                         class="fixed inset-x-0 bottom-0 z-50 w-full rounded-t-3xl bg-outer-space-100 p-6"
                         {...dialogContent}
                         use:dialogContent
-                        in:fly={{
-                            y: 355,
-                            duration: 350,
-                            easing: quintOut,
-                        }}
-                        out:fly={{
-                            y: 355,
-                            duration: 500,
-                            easing: quintIn,
-                            delay: 60,
-                        }}>
+                        in:fly={{ y: 355, duration: 350, easing: quintOut }}
+                        out:fly={{ y: 355, duration: 500, easing: quintIn, delay: 60 }}>
                         <div class="flex flex-col gap-y-3">
                             <div class="flex flex-col">
                                 {#each locations as location}
@@ -156,7 +197,8 @@
                 {/if}
             {/if}
 
-            <button class="justify-self-end p-2" on:click={togglePickups}>
+            <button class="justify-self-end p-2 relative" on:click={togglePickups}>
+                <button class="absolute inset-0 size-full" {...$tooltipTrigger} use:tooltipTrigger />
                 {#if $isPickups}
                     <svg xmlns="http://www.w3.org/2000/svg" class="size-6 fill-old-gold-500" viewBox="0 0 16 16">
                         <path d="M8.186 1.113a.5.5 0 0 0-.372 0L1.846 3.5l2.404.961L10.404 2zm3.564 1.426L5.596 5 8 5.961 14.154 3.5zm3.25 1.7-6.5 2.6v7.922l6.5-2.6V4.24zM7.5 14.762V6.838L1 4.239v7.923zM7.443.184a1.5 1.5 0 0 1 1.114 0l7.129 2.852A.5.5 0 0 1 16 3.5v8.662a1 1 0 0 1-.629.928l-7.185 2.874a.5.5 0 0 1-.372 0L.63 13.09a1 1 0 0 1-.63-.928V3.5a.5.5 0 0 1 .314-.464z" />
@@ -167,6 +209,56 @@
                     </svg>
                 {/if}
             </button>
+
+            {#if $isTooltipOpen}
+            <div
+                {...$tooltipContent} use:tooltipContent
+                transition:fade={{ duration: 100 }}
+                class="z-20 rounded-md bg-old-gold-500 shadow">
+                <div {...$tooltipArrow} use:tooltipArrow />
+                <div class="p-2 flex items-center gap-x-3">
+                    <div class="flex items-center gap-x-2">
+                        <span class="text-xs/normal font-medium text-old-gold-900">Switch by</span>
+                        <input
+                            class="text-xs/normal font-medium text-old-gold-900 bg-old-gold-400 rounded-md p-1"
+                            type="time"
+                            id="appt"
+                            name="appt"
+                            min="09:00"
+                            max="18:00"
+                            bind:value={autoToggleTime}
+                            on:change={() => {
+                                localStorage.setItem('autoToggleTime', autoToggleTime);
+                                if (autoToggleEnabled) checkAutoToggleTime();
+                            }}
+                            required
+                        />
+                    </div>
+
+                    <button class="relative inline-block w-11 h-5" {...timeSwitchRoot} use:timeSwitchRoot>
+                        <input
+                            id="switch-component"
+                            type="checkbox"
+                            class="peer appearance-none w-11 h-5 bg-old-gold-400 rounded-full checked:bg-old-gold-600 cursor-pointer transition-colors duration-300"
+                            bind:checked={autoToggleEnabled}
+                            on:change={() => {
+                                localStorage.setItem('autoToggleEnabled', JSON.stringify(autoToggleEnabled));
+                                if (autoToggleEnabled) {
+                                    checkAutoToggleTime();
+                                    autoToggleInterval = setInterval(checkAutoToggleTime, 60000);
+                                } else {
+                                    clearInterval(autoToggleInterval);
+                                }
+                            }}
+                            {...timeSwitchInput}
+                            use:timeSwitchInput
+                        />
+                        <label for="switch-component" class="absolute top-0 left-0 w-5 h-5 bg-old-gold-200 rounded-full transition-transform duration-300 peer-checked:translate-x-6 cursor-pointer">
+                        </label>
+                    </button>                 
+                </div>
+            </div>
+            {/if}
         </div>
     </div>
 </header>
