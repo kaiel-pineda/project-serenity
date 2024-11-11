@@ -92,9 +92,22 @@
         } else {
             isPickups.set(false);
         }
+
+        if (now.getHours() === 0 && now.getMinutes() === 0) {
+            isPickups.set(false);
+            localStorage.setItem('isPickups', JSON.stringify(false));
+        }
     }
 
-    function formatTime(time): string {
+    $: if (autoToggleEnabled) {
+        checkAutoToggleTime();
+        clearInterval(autoToggleInterval);
+        autoToggleInterval = setInterval(checkAutoToggleTime, 60000);
+    } else {
+        clearInterval(autoToggleInterval);
+    }
+
+    function formatTime(time: string): string {
         const [hour, minute] = autoToggleTime.split(':').map(Number);
         const period = hour >= 12 ? 'PM' : 'AM';
         const formattedHour = hour % 12 === 0 ? 12 : hour % 12;
