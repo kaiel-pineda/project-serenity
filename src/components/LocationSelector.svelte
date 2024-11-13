@@ -7,6 +7,7 @@
 
     const locations: string[] = ['550 Building', 'Beverly Hills', 'Desert', 'GIA', 'Out of Area', 'Streets', 'Valley'];
     let selectedLocation: string = locations[0];
+    const locationLengthThreshold: number = 10;
     let isMobile = false;
     let mounted = false;
 
@@ -49,6 +50,10 @@
 
     function detectMobile() {
         isMobile = window.innerWidth <= 768;
+    }
+
+    function getLocationTextSizeClass(location: string) {
+        return location.length > locationLengthThreshold ? 'text-base' : 'text-xl';
     }
 
     function selectLocation(location: string) {
@@ -172,7 +177,9 @@
 
             {#if !isMobile}
                 <button {...dropdownTrigger} use:dropdownTrigger class="flex items-center justify-between gap-x-1">
-                    <span class="text-xl/normal font-semibold text-fuscous-gray-900">{selectedLocation}</span>
+                    <span class={`font-semibold text-fuscous-gray-900 ${getLocationTextSizeClass(selectedLocation)}`}>
+                        {selectedLocation}
+                    </span>
                     <svg xmlns="http://www.w3.org/2000/svg" class="size-6" fill="currentColor" viewBox="0 -960 960 960">
                         <path d="M480-360 280-560h400L480-360Z" />
                     </svg>
