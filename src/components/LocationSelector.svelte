@@ -167,7 +167,7 @@
 
 <header class="bg-transparent py-3">
     <div class="container mx-auto px-6">
-        <div class="grid grid-cols-[auto_auto_1fr] items-center gap-x-6">
+        <div class="grid grid-cols-[auto_auto_1fr] items-center gap-x-3">
             <div class="flex h-14 w-14 items-center justify-center">
                 <svg class="size-12" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
                     <path fill-rule="evenodd" clip-rule="evenodd" d="M1 7.19l6.64 6.64h.72L15 7.19v-.72l-3.32-3.32-.36-.15H4.68l-.36.15L1 6.47v.72z" fill="#ceb202" />
