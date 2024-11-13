@@ -195,7 +195,9 @@
                 {/if}
             {:else}
                 <button {...dialogTrigger} use:dialogTrigger class="flex items-center justify-between gap-x-1">
-                    <span class="text-xl/normal font-semibold text-fuscous-gray-900">{selectedLocation}</span>
+                    <span class={`font-semibold text-fuscous-gray-900 ${getLocationTextSizeClass(selectedLocation)}`}>
+                        {selectedLocation}
+                    </span>
                     <svg xmlns="http://www.w3.org/2000/svg" class="size-6 fill-fuscous-gray-900" viewBox="0 -960 960 960">
                         <path d="M480-360 280-560h400L480-360Z" />
                     </svg>
